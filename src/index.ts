@@ -1,5 +1,6 @@
 import { readFile, writeFile } from 'fs/promises';
 import { decodeJwt } from 'jose';
+import { stringify } from 'querystring';
 
 interface Config {
   tmxSearchOptions: TmxSearchOptions;
@@ -102,14 +103,16 @@ const TM_API = {
 const FETCH_HEADERS = {
   'Content-Type': 'application/json',
   'User-Agent':
-    'tm-records-checker (runs every once in a while); matej@stieranka.eu',
+    'tm-records-checker (runs every 24h) / https://github.com/mstieranka/tm-records-checker / matej@stieranka.eu',
 } as HeadersInit;
 
 const fetchJson = async <T>(input: RequestInfo, init?: RequestInit) => {
-  return (await (await fetch(input, init)).json()) as T;
+  const response = await fetch(input, init);
+  if (!response.ok) throw response.status;
+  return (await response.json()) as T;
 };
 
-const fetchTmAuthToken = async (authTicket: string, audience: string) => {
+const getTmAuthToken = async (authTicket: string, audience: string) => {
   const auth = await fetchJson<
     TmAuthToken & {
       accessTokenExpiry?: number;
@@ -122,17 +125,18 @@ const fetchTmAuthToken = async (authTicket: string, audience: string) => {
       ...FETCH_HEADERS,
       Authorization: 'ubi_v1 t=' + authTicket,
     },
+  }).catch((status) => {
+    console.error('Request failed with status ', status);
+    return undefined;
   });
+  if (!auth) return auth;
   auth.accessTokenExpiry = (decodeJwt(auth.accessToken).exp ?? 0) * 1000;
   auth.refreshTokenExpiry = (decodeJwt(auth.refreshToken).exp ?? 0) * 1000;
   return auth as TmAuthToken;
 };
 
-const getTmAuthToken = async (
-  authData: AuthData,
-  audience: 'NadeoServices' | 'NadeoLiveServices' | 'NadeoClubServices'
-) => {
-  if (!authData) return;
+const getSession = async (authData: AuthData) => {
+  if (!authData) return undefined;
 
   const session = await fetchJson<TmSessionResponse>(TM_API.sessionUrl, {
     method: 'POST',
@@ -145,8 +149,11 @@ const getTmAuthToken = async (
           'base64'
         ),
     },
+  }).catch((status) => {
+    console.error('Request failed with status ', status);
+    return undefined;
   });
-  return fetchTmAuthToken(session.ticket, audience);
+  return session;
 };
 
 interface Records {
@@ -158,8 +165,12 @@ interface Records {
 }
 
 const readRecordsFile = async () => {
-  const recordsFile = await readFile('records.json');
-  return JSON.parse(recordsFile.toString('utf-8')) as Records;
+  return await readFile('records.json')
+    .then((res) => JSON.parse(res.toString('utf-8')) as Records)
+    .catch(() => {
+      console.info('records.json not found');
+      return undefined;
+    });
 };
 
 const writeRecordsFile = async (records: Records) => {
@@ -167,8 +178,12 @@ const writeRecordsFile = async (records: Records) => {
 };
 
 const readConfigFile = async () => {
-  const configFile = await readFile('config.json');
-  return JSON.parse(configFile.toString('utf-8')) as Config;
+  return await readFile('config.json')
+    .then((res) => JSON.parse(res.toString('utf-8')) as Config)
+    .catch(() => {
+      console.info('config.json not found');
+      return undefined;
+    });
 };
 
 const getMapList = async (searchOptions: TmxSearchOptions) => {
@@ -186,7 +201,12 @@ const getMapList = async (searchOptions: TmxSearchOptions) => {
   return mapList;
 };
 
-const getNewRecords = (oldRecords: Records, newRecords: Records) => {
+const getNewRecords = (
+  oldRecords: Records | undefined,
+  newRecords: Records
+) => {
+  if (!oldRecords) return newRecords;
+
   let diff = {} as Records;
 
   const oldMaps = Object.keys(oldRecords);
@@ -217,11 +237,17 @@ const WAIT_TIME = 24 * 60 * 60 * 1000;
 (async () => {
   // load config
   const config = await readConfigFile();
+  if (!config) {
+    console.error('Expected "config.json"');
+    return;
+  }
   if (!config.tmAuth) {
     console.error('Expected "tmAuth" property in "config.json"');
+    return;
   }
   if (!config.tmxSearchOptions) {
     console.error('Expected "tmxSearchOptions" property in "config.json"');
+    return;
   }
   if (!config.pushbulletAuthKey) {
     console.info(
@@ -251,14 +277,32 @@ const WAIT_TIME = 24 * 60 * 60 * 1000;
       pusher.note(iden, 'New TM Records', message);
     }
   };
-
-  let nadeoLiveToken: TmAuthToken | undefined = undefined;
-  let nadeoToken: TmAuthToken | undefined = undefined;
+  let session: TmSessionResponse | undefined;
+  let nadeoToken: TmAuthToken | undefined;
+  let nadeoLiveToken: TmAuthToken | undefined;
   while (true) {
     // get new refresh token
-    nadeoLiveToken = await getTmAuthToken(config.tmAuth, 'NadeoLiveServices');
-    nadeoToken = await getTmAuthToken(config.tmAuth, 'NadeoServices');
-    console.log('Got Nadeo TM API tokens', nadeoLiveToken, nadeoToken);
+    session = await getSession(config.tmAuth);
+    if (!session?.ticket) {
+      console.error('Session start failed, exiting...');
+      return;
+    }
+    console.log('Got session ticket');
+
+    nadeoToken = await getTmAuthToken(session.ticket, 'NadeoServices');
+    if (!nadeoToken) {
+      console.error('Token acquiry failed, exiting...');
+      return;
+    }
+    console.log('Got NadeoServices token');
+
+    nadeoLiveToken = await getTmAuthToken(session.ticket, 'NadeoLiveServices');
+    if (!nadeoLiveToken) {
+      console.error('Token acquiry failed, exiting...');
+      return;
+    }
+    console.log('Got NadeoLiveServices token');
+
     while (true) {
       while (nadeoLiveToken?.accessTokenExpiry ?? 0 > Date.now()) {
         const mapList = await getMapList(config.tmxSearchOptions);
@@ -329,7 +373,7 @@ const WAIT_TIME = 24 * 60 * 60 * 1000;
         break;
       }
       // get new access token
-      nadeoLiveToken = await fetchTmAuthToken(
+      nadeoLiveToken = await getTmAuthToken(
         nadeoLiveToken.refreshToken,
         'NadeoLiveServices'
       );
