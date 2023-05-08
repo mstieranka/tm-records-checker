@@ -1,6 +1,5 @@
 import { readFile, writeFile } from 'fs/promises';
 import { decodeJwt } from 'jose';
-import { stringify } from 'querystring';
 
 interface Config {
   tmxSearchOptions: TmxSearchOptions;
@@ -108,7 +107,7 @@ const FETCH_HEADERS = {
 
 const fetchJson = async <T>(input: RequestInfo, init?: RequestInit) => {
   const response = await fetch(input, init);
-  if (!response.ok) throw response.status;
+  if (!response.ok) throw response;
   return (await response.json()) as T;
 };
 
@@ -233,6 +232,11 @@ const getNewRecords = (
   return diff;
 };
 
+const sleep = async (timeoutMs: number) => {
+  console.log('Waiting for ' + timeoutMs / 60 / 1000 + ' minutes');
+  await new Promise((resolve) => setTimeout(resolve, timeoutMs));
+};
+
 const WAIT_TIME = 24 * 60 * 60 * 1000;
 (async () => {
   // load config
@@ -307,41 +311,50 @@ const WAIT_TIME = 24 * 60 * 60 * 1000;
       while (nadeoLiveToken?.accessTokenExpiry ?? 0 > Date.now()) {
         const mapList = await getMapList(config.tmxSearchOptions);
         let records: { [key: string]: any } = {};
-        for (const map of mapList.results) {
-          // get map records
-          const leaderboard = await fetchJson<TmLeaderboard>(
-            TM_API.leaderboardsUrl(map.TrackUID),
-            {
-              headers: {
-                ...FETCH_HEADERS,
-                Authorization: 'nadeo_v1 t=' + nadeoLiveToken?.accessToken,
-              },
-            }
-          );
-          const rawRecords = leaderboard.tops.at(0)?.top ?? [];
-          // get usernames for accountIds in leaderboard
-          const accountIds = rawRecords.map((item) => item.accountId);
-          const displayNames = await fetchJson<TmDisplayNameItem[]>(
-            TM_API.displayNamesUrl(accountIds),
-            {
-              headers: {
-                ...FETCH_HEADERS,
-                Authorization: 'nadeo_v1 t=' + nadeoToken?.accessToken,
-              },
-            }
-          ).then((arr) => {
-            const result = new Map<string, string>();
-            arr.forEach((acc) => result.set(acc.accountId, acc.displayName));
-            return result;
-          });
-          // create records data structure from leaderboard
-          records[map.Name] = rawRecords.map((rec, idx) => {
-            return {
-              position: idx + 1,
-              username: displayNames.get(rec.accountId) ?? 'unknown',
-              time: rec.score / 1000,
-            };
-          });
+        try {
+          for (const map of mapList.results) {
+            // get map records
+            const leaderboard = await fetchJson<TmLeaderboard>(
+              TM_API.leaderboardsUrl(map.TrackUID),
+              {
+                headers: {
+                  ...FETCH_HEADERS,
+                  Authorization: 'nadeo_v1 t=' + nadeoLiveToken?.accessToken,
+                },
+              }
+            );
+            const rawRecords = leaderboard.tops.at(0)?.top ?? [];
+            // get usernames for accountIds in leaderboard
+            const accountIds = rawRecords.map((item) => item.accountId);
+            const displayNames = await fetchJson<TmDisplayNameItem[]>(
+              TM_API.displayNamesUrl(accountIds),
+              {
+                headers: {
+                  ...FETCH_HEADERS,
+                  Authorization: 'nadeo_v1 t=' + nadeoToken?.accessToken,
+                },
+              }
+            ).then((arr) => {
+              const result = new Map<string, string>();
+              arr.forEach((acc) => result.set(acc.accountId, acc.displayName));
+              return result;
+            });
+            // create records data structure from leaderboard
+            records[map.Name] = rawRecords.map((rec, idx) => {
+              return {
+                position: idx + 1,
+                username: displayNames.get(rec.accountId) ?? 'unknown',
+                time: rec.score / 1000,
+              };
+            });
+          }
+        } catch (e) {
+          console.error('Resetting due to an error', e);
+          session = undefined;
+          nadeoToken = undefined;
+          nadeoLiveToken = undefined;
+          await sleep(30 * 1000);
+          break;
         }
         // compare to last result cached in file
         const fileRecords = await readRecordsFile();
@@ -362,9 +375,7 @@ const WAIT_TIME = 24 * 60 * 60 * 1000;
         } else {
           console.log('No changes detected');
         }
-
-        console.log('Waiting for ' + WAIT_TIME / 60 / 60 / 1000 + ' hours');
-        await new Promise((resolve) => setTimeout(resolve, WAIT_TIME));
+        await sleep(WAIT_TIME);
       }
       if (
         !nadeoLiveToken?.refreshToken ||
