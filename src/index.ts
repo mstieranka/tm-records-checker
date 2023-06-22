@@ -1,3 +1,4 @@
+import { error } from 'console';
 import { readFile, writeFile } from 'fs/promises';
 import { decodeJwt } from 'jose';
 
@@ -238,6 +239,7 @@ const sleep = async (timeoutMs: number) => {
 };
 
 const WAIT_TIME = 24 * 60 * 60 * 1000;
+const DEFAULT_ERROR_WAIT_TIME = 30 * 1000;
 (async () => {
   // load config
   const config = await readConfigFile();
@@ -284,6 +286,8 @@ const WAIT_TIME = 24 * 60 * 60 * 1000;
   let session: TmSessionResponse | undefined;
   let nadeoToken: TmAuthToken | undefined;
   let nadeoLiveToken: TmAuthToken | undefined;
+
+  let errorWaitTime = DEFAULT_ERROR_WAIT_TIME;
   while (true) {
     // get new refresh token
     session = await getSession(config.tmAuth);
@@ -309,9 +313,9 @@ const WAIT_TIME = 24 * 60 * 60 * 1000;
 
     while (true) {
       while (nadeoLiveToken?.accessTokenExpiry ?? 0 > Date.now()) {
-        const mapList = await getMapList(config.tmxSearchOptions);
-        let records: { [key: string]: any } = {};
         try {
+          const mapList = await getMapList(config.tmxSearchOptions);
+          let records: { [key: string]: any } = {};
           for (const map of mapList.results) {
             // get map records
             const leaderboard = await fetchJson<TmLeaderboard>(
@@ -348,34 +352,36 @@ const WAIT_TIME = 24 * 60 * 60 * 1000;
               };
             });
           }
+          // compare to last result cached in file
+          const fileRecords = await readRecordsFile();
+          const diff = getNewRecords(fileRecords, records);
+          // if there are changes, notify and save new version
+          if (Object.keys(diff).length) {
+            let message = 'Found new records:\n';
+            for (const [mapName, records] of Object.entries(diff)) {
+              message += `=> ${mapName}\n`;
+              for (const record of records) {
+                message += `${record?.position}. ${record.username} - ${record.time}\n`;
+              }
+              message += '\n';
+            }
+            console.log(message);
+            sendMessage(message);
+            writeRecordsFile(records);
+          } else {
+            console.log('No changes detected');
+          }
+          errorWaitTime = DEFAULT_ERROR_WAIT_TIME;
+          await sleep(WAIT_TIME);
         } catch (e) {
           console.error('Resetting due to an error', e);
           session = undefined;
           nadeoToken = undefined;
           nadeoLiveToken = undefined;
-          await sleep(30 * 1000);
+          await sleep(errorWaitTime);
+          errorWaitTime *= 2;
           break;
         }
-        // compare to last result cached in file
-        const fileRecords = await readRecordsFile();
-        const diff = getNewRecords(fileRecords, records);
-        // if there are changes, notify and save new version
-        if (Object.keys(diff).length) {
-          let message = 'Found new records:\n';
-          for (const [mapName, records] of Object.entries(diff)) {
-            message += `=> ${mapName}\n`;
-            for (const record of records) {
-              message += `${record?.position}. ${record.username} - ${record.time}\n`;
-            }
-            message += '\n';
-          }
-          console.log(message);
-          sendMessage(message);
-          writeRecordsFile(records);
-        } else {
-          console.log('No changes detected');
-        }
-        await sleep(WAIT_TIME);
       }
       if (
         !nadeoLiveToken?.refreshToken ||
