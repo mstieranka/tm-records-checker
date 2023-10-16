@@ -239,6 +239,7 @@ const sleep = async (timeoutMs: number) => {
 };
 
 const WAIT_TIME = 24 * 60 * 60 * 1000;
+const MAX_ERROR_WAIT_TIME = 60 * 60 * 1000;
 const DEFAULT_ERROR_WAIT_TIME = 30 * 1000;
 (async () => {
   // load config
@@ -379,7 +380,9 @@ const DEFAULT_ERROR_WAIT_TIME = 30 * 1000;
           nadeoToken = undefined;
           nadeoLiveToken = undefined;
           await sleep(errorWaitTime);
-          errorWaitTime *= 2;
+          if (errorWaitTime < MAX_ERROR_WAIT_TIME) {
+            errorWaitTime *= 2;
+          }
           break;
         }
       }
