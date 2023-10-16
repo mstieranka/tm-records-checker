@@ -1,14 +1,11 @@
-FROM node:18-alpine
+FROM oven/bun:alpine
+RUN apk --no-cache add curl
 
-RUN mkdir /app
-RUN mkdir /app/build
-RUN chown -R node:node /app
-
-COPY package.json package-lock.json /app/
 WORKDIR /app
-RUN npm install
+COPY package.json ./
+COPY bun.lockb ./
+COPY src ./
 
-USER node
-COPY --chown=node:node . /app/
+RUN bun install
 
-CMD ["npm", "start"]
+CMD ["bun", "start"]
