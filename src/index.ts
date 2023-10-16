@@ -239,7 +239,7 @@ const sleep = async (timeoutMs: number) => {
 };
 
 const WAIT_TIME = 24 * 60 * 60 * 1000;
-const MAX_ERROR_WAIT_TIME = 60 * 60 * 1000;
+const MAX_ERROR_WAIT_TIME = WAIT_TIME;
 const DEFAULT_ERROR_WAIT_TIME = 30 * 1000;
 (async () => {
   // load config
@@ -289,6 +289,7 @@ const DEFAULT_ERROR_WAIT_TIME = 30 * 1000;
   let nadeoLiveToken: TmAuthToken | undefined;
 
   let errorWaitTime = DEFAULT_ERROR_WAIT_TIME;
+  let noChangeCounter = 0;
   while (true) {
     // get new refresh token
     session = await getSession(config.tmAuth);
@@ -369,8 +370,14 @@ const DEFAULT_ERROR_WAIT_TIME = 30 * 1000;
             console.log(message);
             sendMessage(message);
             writeRecordsFile(records);
+            noChangeCounter = 0;
           } else {
             console.log('No changes detected');
+			noChangeCounter++;
+			if (noChangeCounter >= 10) {
+				sendMessage('No changes detected in last 10 tries');
+				noChangeCounter = 0;
+			}
           }
           errorWaitTime = DEFAULT_ERROR_WAIT_TIME;
           await sleep(WAIT_TIME);
@@ -382,6 +389,8 @@ const DEFAULT_ERROR_WAIT_TIME = 30 * 1000;
           await sleep(errorWaitTime);
           if (errorWaitTime < MAX_ERROR_WAIT_TIME) {
             errorWaitTime *= 2;
+          } else {
+          	sendMessage('Max error wait time exceeded');
           }
           break;
         }
