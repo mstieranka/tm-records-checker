@@ -6,3 +6,6 @@ services:
       - type: bind
         source: ./records.json
         target: /app/records.json
+      - type: bind
+        source: ./config.json
+        target: /app/config.json
