@@ -96,6 +96,7 @@ export const getRecords = async (
   basicApi: BasicApi,
   oauthApi: OAuthApi
 ) => {
+  console.log(`Getting records for ${map.Name}`);
   const leaderboard = await basicApi.getLeaderboard(map.TrackUID);
   const rawRecords = leaderboard.tops.at(0)?.top ?? [];
   const accountIds = rawRecords.map((item) => item.accountId);

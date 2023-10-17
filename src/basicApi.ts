@@ -95,6 +95,7 @@ export class BasicApi {
   private async getSession(authData: BasicAuthData) {
     let session = undefined;
     while (!session) {
+      console.log('Getting TM session');
       session = await fetchJson<TmSessionResponse>(TM_API_SESSION_URL, {
         method: 'POST',
         headers: {
@@ -116,6 +117,7 @@ export class BasicApi {
   private async getTmAuthToken(
     audience: 'NadeoServices' | 'NadeoLiveServices' | 'NadeoClubServices'
   ) {
+    console.log(`Getting ${audience} token`);
     const auth = await fetchJson<TmAuthToken>(TM_API_AUTH_URL, {
       method: 'POST',
       body: JSON.stringify({ audience }),
