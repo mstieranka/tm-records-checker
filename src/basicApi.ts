@@ -7,7 +7,7 @@ export interface BasicAuthData {
   password: string;
 }
 
-export interface TmSessionResponse {
+interface TmSessionResponse {
   platformType: 'uplay';
   ticket: string;
   twoFactorAuthenticationTicket: string;
@@ -25,7 +25,7 @@ export interface TmSessionResponse {
   rememberMeTicket: string;
 }
 
-export interface TmAuthToken {
+interface TmAuthToken {
   accessToken: string;
   accessTokenExpiry?: number;
   refreshToken: string;

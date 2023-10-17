@@ -76,7 +76,6 @@ export class OAuthApi {
       }
     );
     const newNames: Record<string, string> = await response.json();
-    console.log(newNames);
 
     // set all missing display names
     for (const [id, name] of Object.entries(newNames)) {
