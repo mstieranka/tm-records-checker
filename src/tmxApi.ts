@@ -33,6 +33,11 @@ export class TmxApi {
         },
       }
     );
+    if (!mapListResponse.ok) {
+      throw new Error(
+        `Failed to retrieve map list: ${mapListResponse.statusText}`
+      );
+    }
     const mapList: { results: TmxMap[]; totalItemCount: number } =
       await mapListResponse.json();
     if (mapList.results.length < mapList.totalItemCount) {
