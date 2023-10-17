@@ -30,4 +30,6 @@ If you want display names to be shown (e.g. `playerTM` instead of `bf64ca65-f1da
 
 Run using `bun start`. This worked with `Bun 1.0.6` for me.
 
+If using `docker-compose.yml`, make sure to create `records.json` beforehand, otherwise the container creation will throw an error.
+
 I'm using this for my purposes only so the implementation is a bit lacking, but if you do make a PR, I may look at it.
