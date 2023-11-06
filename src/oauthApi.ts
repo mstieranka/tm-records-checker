@@ -38,10 +38,20 @@ export class OAuthApi {
           body: `grant_type=client_credentials&client_id=${this.config.tmOAuth.clientId}&client_secret=${this.config.tmOAuth.clientSecret}`,
         }
       );
-      const auth = await response.json();
-      if (!auth.access_token) {
-        throw new Error('Failed to refresh token');
+
+      if (!response.ok) {
+        throw new Error('Failed to refresh OAuth token: ' + response.statusText);
       }
+
+      const auth = (await response.json()) as {
+        access_token: string;
+        expires_in: number;
+      };
+
+      if (!auth.access_token) {
+        throw new Error('Failed to refresh OAuth token');
+      }
+
       this.auth = {
         accessToken: auth.access_token,
         expiresAt: Date.now() + auth.expires_in * 1000,
@@ -75,7 +85,12 @@ export class OAuthApi {
         },
       }
     );
-    const newNames: Record<string, string> = await response.json();
+    if (!response.ok) {
+      throw new Error(
+        'Failed to retrieve display names: ' + response.statusText
+      );
+    }
+    const newNames = (await response.json()) as Record<string, string>;
 
     // set all missing display names
     for (const [id, name] of Object.entries(newNames)) {

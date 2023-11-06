@@ -144,7 +144,12 @@ export class BasicApi {
         Authorization: 'nadeo_v1 t=' + this.liveAuth?.refreshToken,
       },
     });
-    const auth: TmAuthToken = await authResponse.json();
+    if (!authResponse.ok) {
+      throw new Error(
+        `Failed to refresh TM basic auth token: ${authResponse.statusText}`
+      );
+    }
+    const auth = (await authResponse.json()) as TmAuthToken;
     if (!auth.accessToken) {
       throw new Error('Failed to refresh token');
     }

@@ -38,8 +38,10 @@ export class TmxApi {
         `Failed to retrieve map list: ${mapListResponse.statusText}`
       );
     }
-    const mapList: { results: TmxMap[]; totalItemCount: number } =
-      await mapListResponse.json();
+    const mapList = (await mapListResponse.json()) as {
+      results: TmxMap[];
+      totalItemCount: number;
+    };
     if (mapList.results.length < mapList.totalItemCount) {
       console.error(
         `Expected ${mapList.totalItemCount} maps, got ${mapList.results.length}`
