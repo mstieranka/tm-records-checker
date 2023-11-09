@@ -1,7 +1,7 @@
 import { Config } from './config';
 
 export interface TmxSearchOptions {
-  tmxUsername: string;
+  tmxUserId: number;
 }
 
 export interface TmxMap extends Object {
@@ -12,8 +12,8 @@ export interface TmxMap extends Object {
 
 const TMX_BASE_URL = 'https://trackmania.exchange';
 const TMX_SEARCH_LIMIT = 100;
-const getTmxSearchUrl = (author: string) =>
-  `${TMX_BASE_URL}/mapsearch2/search?api=on&limit=${TMX_SEARCH_LIMIT}&author=${author}`;
+const getTmxSearchUrl = (authorId: string) =>
+  `${TMX_BASE_URL}/mapsearch2/search?api=on&limit=${TMX_SEARCH_LIMIT}&authorId=${authorId}`;
 
 export class TmxApi {
   constructor(config: Config) {
@@ -25,7 +25,7 @@ export class TmxApi {
   async getTmxMaps() {
     console.log('Retrieving map list');
     const mapListResponse = await fetch(
-      getTmxSearchUrl(this.config.tmxSearchOptions.tmxUsername),
+      getTmxSearchUrl(this.config.tmxSearchOptions.tmxUserId),
       {
         headers: {
           'Content-Type': 'application/json',

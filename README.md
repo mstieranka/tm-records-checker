@@ -7,7 +7,7 @@ You will need `config.json` in the root repo folder:
 ```json
 {
   "tmxSearchOptions": {
-    "tmxUsername": "user_tmx"
+    "tmxUserId": 12345
   },
   "pushbulletAuthKey": "o.0a1b2c3d4e5f6g7h8i9x",
   "tmAuth": {
@@ -22,7 +22,8 @@ You will need `config.json` in the root repo folder:
 }
 ```
 
-Keep in mind `tmxUsername` is your username on TMX, not in-game. `tmAuth` is the email and password to your Ubisoft account (needed for authentication to the Trackmania API).
+`tmxUserId` is your user ID on TMX. This is shown as "ID" on your TMX profile page.
+`tmAuth` is the email and password to your Ubisoft account (needed for authentication to the Trackmania API).
 
 If you want display names to be shown (e.g. `playerTM` instead of `bf64ca65-f1da-4662-b827-e84fb59b821f`), you'll need to provide your own OAuth2 client ID and client secret to access the Trackmania OAuth API (because Nadeo removed the endpoint from their public API - wtf?). You can learn more about how to get that [here](https://webservices.openplanet.dev/oauth/auth#machine-to-machine-flow) and in the section below.
 
