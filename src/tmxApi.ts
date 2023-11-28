@@ -12,7 +12,7 @@ export interface TmxMap extends Object {
 
 const TMX_BASE_URL = 'https://trackmania.exchange';
 const TMX_SEARCH_LIMIT = 100;
-const getTmxSearchUrl = (authorId: string) =>
+const getTmxSearchUrl = (authorId: number) =>
   `${TMX_BASE_URL}/mapsearch2/search?api=on&limit=${TMX_SEARCH_LIMIT}&authorId=${authorId}`;
 
 export class TmxApi {
