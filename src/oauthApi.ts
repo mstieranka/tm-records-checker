@@ -40,7 +40,9 @@ export class OAuthApi {
       );
 
       if (!response.ok) {
-        throw new Error('Failed to refresh OAuth token: ' + response.statusText);
+        throw new Error(
+          'Failed to refresh OAuth token: ' + response.statusText
+        );
       }
 
       const auth = (await response.json()) as {
@@ -73,6 +75,10 @@ export class OAuthApi {
       } else {
         displayNames[accountId] = this.accountNames[accountId];
       }
+    }
+
+    if (missingDisplayNames.length === 0) {
+      return displayNames;
     }
 
     const response = await fetch(
