@@ -55,7 +55,7 @@ const main = async () => {
       } else {
         notifier?.sendMessage(
           'TM records error',
-          'Max error wait time exceeded'
+          e instanceof Error ? e.toString() : 'Unknown error'
         );
       }
     }
