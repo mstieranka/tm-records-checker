@@ -1,0 +1,192 @@
+{
+  "version": "5",
+  "dialect": "sqlite",
+  "id": "bce4a88f-51eb-43af-995f-11060ed3a688",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "tables": {
+    "maps": {
+      "name": "maps",
+      "columns": {
+        "ingame_id": {
+          "name": "ingame_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ingame_name": {
+          "name": "ingame_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "tmx_id": {
+          "name": "tmx_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "tmx_name": {
+          "name": "tmx_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "author_time_ms": {
+          "name": "author_time_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "uploaded_at": {
+          "name": "uploaded_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "maps_tmx_id_unique": {
+          "name": "maps_tmx_id_unique",
+          "columns": [
+            "tmx_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "players": {
+      "name": "players",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "records": {
+      "name": "records",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "map_id": {
+          "name": "map_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "player_id": {
+          "name": "player_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "time_ms": {
+          "name": "time_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "timestamp": {
+          "name": "timestamp",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "records_map_id_player_id_unique": {
+          "name": "records_map_id_player_id_unique",
+          "columns": [
+            "map_id",
+            "player_id"
+          ],
+          "isUnique": true
+        },
+        "records_map_id_player_id_time_ms_unique": {
+          "name": "records_map_id_player_id_time_ms_unique",
+          "columns": [
+            "map_id",
+            "player_id",
+            "time_ms"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "records_map_id_maps_ingame_id_fk": {
+          "name": "records_map_id_maps_ingame_id_fk",
+          "tableFrom": "records",
+          "tableTo": "maps",
+          "columnsFrom": [
+            "map_id"
+          ],
+          "columnsTo": [
+            "ingame_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "records_player_id_players_id_fk": {
+          "name": "records_player_id_players_id_fk",
+          "tableFrom": "records",
+          "tableTo": "players",
+          "columnsFrom": [
+            "player_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  }
+}

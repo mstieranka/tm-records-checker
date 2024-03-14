@@ -1,0 +1,86 @@
+:root {
+  --typography-spacing-vertical: 1rem;
+}
+
+article {
+  padding: 2rem;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+}
+
+p {
+  font-size: 0.875rem;
+}
+
+.no-arrow::after {
+  display: none !important;
+}
+
+.no-arrow {
+  background-color: transparent !important;
+  border: 0 !important;
+}
+
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-only {
+    display: block !important; /* or inline, inline-block, flex, etc., depending on the desired display type */
+  }
+  .desktop-only {
+    display: none !important;
+  }
+  .flex-desktop {
+    display: block !important;
+  }
+}
+
+/* The element is displayed by default on larger screens without needing an explicit rule, but you can add one for clarity or specificity */
+.desktop-only {
+  display: block; /* or inline, inline-block, flex, etc. */
+}
+
+.middle {
+  align-items: center;
+  vertical-align: middle;
+  justify-content: center;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-desktop {
+  display: flex;
+}
+
+.gap {
+  gap: 0.5rem;
+}
+
+.flex-grow {
+  flex-grow: 1;
+}
+
+.block {
+  display: block;
+}
+
+.flex-mobile {
+  flex-direction: column-reverse;
+}
+
+@media (min-width: 768px) {
+  .flex-mobile {
+    flex-direction: row;
+  }
+}
+
+.mb-0 {
+  margin-bottom: 0;
+}

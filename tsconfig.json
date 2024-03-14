@@ -1,7 +1,13 @@
 {
+  "include": ["remix.env.d.ts", "pushbullet.d.ts", "**/*.ts", "**/*.tsx"],
   "compilerOptions": {
     // add Bun type definitions
     "types": ["bun-types"],
+
+    "paths": {
+      "~/*": ["./app/*"]
+    },
+    "baseUrl": ".",
 
     // enable latest features
     "lib": ["esnext"],
@@ -19,6 +25,8 @@
     "jsx": "react-jsx", // support JSX
     "allowJs": true, // allow importing `.js` from `.ts`
     "esModuleInterop": true, // allow default imports for CommonJS modules
+    "resolveJsonModule": true,
+    "isolatedModules": true,
 
     // best practices
     "strict": true,

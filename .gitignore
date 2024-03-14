@@ -1,3 +1,6 @@
 node_modules/
 config.json
-records.json
+
+sqlite.db
+build/
+.cache/

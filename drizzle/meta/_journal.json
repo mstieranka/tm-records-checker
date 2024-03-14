@@ -1,0 +1,13 @@
+{
+  "version": "5",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1710405586531,
+      "tag": "0000_useful_silk_fever",
+      "breakpoints": true
+    }
+  ]
+}

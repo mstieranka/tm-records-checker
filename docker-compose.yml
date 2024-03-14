@@ -4,8 +4,8 @@ services:
     build: .
     volumes:
       - type: bind
-        source: ./records.json
-        target: /app/records.json
+        source: ./sqlite.db
+        target: /app/sqlite.db
       - type: bind
         source: ./config.json
         target: /app/config.json
