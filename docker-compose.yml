@@ -3,7 +3,7 @@ services:
   checker:
     build: .
     ports:
-      - "8080:3000"
+      - '3020:3000'
     volumes:
       - type: bind
         source: ./sqlite.db
