@@ -2,6 +2,8 @@ version: '3.9'
 services:
   checker:
     build: .
+    ports:
+      - "8080:3000"
     volumes:
       - type: bind
         source: ./sqlite.db
