@@ -85,7 +85,7 @@ const validateConfig = (config: Partial<Config>) => {
 };
 
 export const reloadConfig = async () => {
-  const file = Bun.file('config.json');
+  const file = Bun.file('./data/config.json');
   if (!file.exists()) {
     throw new Error('config.json not found');
   }
@@ -103,7 +103,10 @@ export const getConfig = () => {
 };
 
 export const saveConfig = async (config: Config) => {
-  await Bun.write(Bun.file('config.json'), JSON.stringify(config, null, 2));
+  await Bun.write(
+    Bun.file('./data/config.json'),
+    JSON.stringify(config, null, 2)
+  );
   _config = config;
   return config;
 };

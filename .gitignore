@@ -1,6 +1,5 @@
 node_modules/
-config.json
 
-sqlite.db
 build/
 .cache/
+data/

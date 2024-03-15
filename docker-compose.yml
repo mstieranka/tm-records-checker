@@ -8,8 +8,5 @@ services:
       - NODE_ENV=production
     volumes:
       - type: bind
-        source: ./sqlite.db
-        target: /app/sqlite.db
-      - type: bind
-        source: ./config.json
-        target: /app/config.json
+        source: ./data/
+        target: /app/data/

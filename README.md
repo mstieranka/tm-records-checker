@@ -2,7 +2,7 @@
 
 Use this tool to get notified (via ntfy.sh, by getting a message in the standard terminal output or in a management UI) if one of your Trackmania (2020) maps uploaded on Trackmania Exchange gets a new top 10 record.
 
-You will need `config.json` in the root repo folder:
+You will need `data/config.json`:
 
 ```json
 {
