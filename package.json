@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "type": "module",
   "scripts": {
-    "build": "remix build",
+    "build": "NODE_ENV=production remix build",
     "start": "cross-env NODE_ENV=production bun run main.ts",
     "dev": "remix dev -c \"bun main.ts\"",
     "migrate": "drizzle-kit generate:sqlite --schema ./app/models/schema.ts; bun run migrate.ts"
