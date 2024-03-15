@@ -4,6 +4,8 @@ services:
     build: .
     ports:
       - '3020:3000'
+    environment:
+      - NODE_ENV=production
     volumes:
       - type: bind
         source: ./sqlite.db
