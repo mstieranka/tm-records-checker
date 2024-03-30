@@ -89,6 +89,7 @@ function createNotificationData(
         return (
           `=> ${mapName}\n` +
           updates
+            .sort((a, b) => a.position - b.position)
             .map(
               (update) =>
                 `${update.position}. ${update.playerName} - ${formatTime(
