@@ -1,6 +1,4 @@
 FROM oven/bun:alpine
-RUN apk add --update python3 make g++\
-   && rm -rf /var/cache/apk/*
 
 WORKDIR /app
 COPY package.json ./
