@@ -1,8 +1,21 @@
 import { LoaderFunctionArgs, json } from '@remix-run/node';
-import { useLoaderData } from '@remix-run/react';
+import { MetaFunction, useLoaderData } from '@remix-run/react';
 import { getMapInfo } from '~/models/maps.server';
 import { authenticator } from '~/services/auth.server';
 import { formatTime, formatTimestamp } from '~/utils';
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  if (!data || 'error' in data) {
+    return [{ title: 'Error | TM Records Checker' }];
+  }
+  return [
+    {
+      title: `${
+        data.mapInfo?.tmxName ?? data.mapInfo?.ingameName
+      } | TM Records Checker`,
+    },
+  ];
+};
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   await authenticator.isAuthenticated(request, {

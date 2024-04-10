@@ -1,7 +1,11 @@
 import { json, LoaderFunctionArgs } from '@remix-run/node';
-import { Form, useLoaderData } from '@remix-run/react';
+import { Form, MetaFunction, useLoaderData } from '@remix-run/react';
 import { authenticator } from '~/services/auth.server';
 import { commitSession, getSession } from '~/services/session.server';
+
+export const meta: MetaFunction = () => {
+  return [{ title: 'Login | TM Records Checker' }];
+};
 
 export default function Screen() {
   const data = useLoaderData<{ error: any } | undefined>();

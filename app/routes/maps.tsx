@@ -1,9 +1,13 @@
-import { useLoaderData } from '@remix-run/react';
+import { MetaFunction, useLoaderData } from '@remix-run/react';
 import { LoaderFunctionArgs, json } from '@remix-run/node';
 import { getMaps } from '~/models/maps.server';
 import { useState } from 'react';
 import { authenticator } from '~/services/auth.server';
 import { formatTime } from '~/utils';
+
+export const meta: MetaFunction = () => {
+  return [{ title: 'Maps | TM Records Checker' }];
+};
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await authenticator.isAuthenticated(request, {

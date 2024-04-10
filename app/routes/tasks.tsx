@@ -2,12 +2,17 @@ import { ActionFunctionArgs, LoaderFunctionArgs, json } from '@remix-run/node';
 import { pollTask, tasks } from '../core/tasks.server';
 import {
   Form,
+  MetaFunction,
   useActionData,
   useLoaderData,
   useNavigation,
 } from '@remix-run/react';
 import { authenticator } from '~/services/auth.server';
 import { ClockPlayIcon, ClockStopIcon, PlayIcon } from '~/assets/Icons';
+
+export const meta: MetaFunction = () => {
+  return [{ title: 'Tasks | TM Records Checker' }];
+};
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await authenticator.isAuthenticated(request, {

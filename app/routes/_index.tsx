@@ -1,8 +1,12 @@
 import { LoaderFunctionArgs, json } from '@remix-run/node';
-import { useLoaderData } from '@remix-run/react';
+import { MetaFunction, useLoaderData } from '@remix-run/react';
 import { getLatestRecords } from '~/models/records.server';
 import { authenticator } from '~/services/auth.server';
 import { formatTime, formatTimestamp } from '~/utils';
+
+export const meta: MetaFunction = () => {
+  return [{ title: 'Home | TM Records Checker' }];
+};
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await authenticator.isAuthenticated(request, {
@@ -37,8 +41,8 @@ export default function Index() {
                   <a href={`/records/${record.mapId}`}>{record.mapName}</a>
                 </td>
                 <td>{record.position}</td>
-                <td>{record.playerName}</td>
                 <td>{formatTime(record.timeMs)}</td>
+                <td>{record.playerName}</td>
                 <td>{formatTimestamp(record.timestamp)}</td>
               </tr>
             ))}

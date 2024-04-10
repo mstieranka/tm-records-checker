@@ -1,6 +1,7 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
 import {
   Form,
+  MetaFunction,
   useActionData,
   useLoaderData,
   useNavigation,
@@ -9,6 +10,10 @@ import { useState } from 'react';
 import { EyeIcon, EyeOffIcon, ReloadIcon, SaveIcon } from '~/assets/Icons';
 import { getConfig, reloadConfig, saveConfig } from '~/core/config.server';
 import { authenticator } from '~/services/auth.server';
+
+export const meta: MetaFunction = () => {
+  return [{ title: 'Settings | TM Records Checker' }];
+};
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await authenticator.isAuthenticated(request, {
