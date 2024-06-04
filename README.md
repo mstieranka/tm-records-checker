@@ -44,6 +44,6 @@ These are needed in order to show display names (e.g. `playerTM` instead of `bf6
 
 Every option except for `notifications.ntfy` is required.
 
-Create a database using `bun migrate`, build using `bun build` and run using `bun start`. This worked with `Bun 1.0.30` for me.
+Create a database using `bun db:migrate`, build using `bun build` and run using `bun start`. This worked with `Bun 1.0.30` for me.
 
 I'm using this for my purposes only so the implementation is a bit lacking, but if you do make a PR, I may look at it.

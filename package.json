@@ -5,9 +5,10 @@
   "scripts": {
     "build": "NODE_ENV=production remix build",
     "start": "cross-env NODE_ENV=production bun run main.ts",
-    "start:prod": "bun migrate && bun start",
+    "start:prod": "bun db:migrate && bun start",
     "dev": "remix dev -c \"bun main.ts\"",
-    "migrate": "drizzle-kit generate:sqlite --schema ./app/models/schema.ts; bun run migrate.ts"
+    "db:generate": "drizzle-kit generate:sqlite --schema ./app/models/schema.ts",
+    "db:migrate": "bun run migrate.ts"
   },
   "author": "Matej Stieranka <matej@stieranka.eu>",
   "license": "ISC",
