@@ -1,8 +1,6 @@
 {
-  "version": "5",
+  "version": "6",
   "dialect": "sqlite",
-  "id": "bce4a88f-51eb-43af-995f-11060ed3a688",
-  "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "maps": {
       "name": "maps",
@@ -155,28 +153,28 @@
         "records_map_id_maps_ingame_id_fk": {
           "name": "records_map_id_maps_ingame_id_fk",
           "tableFrom": "records",
-          "tableTo": "maps",
           "columnsFrom": [
             "map_id"
           ],
+          "tableTo": "maps",
           "columnsTo": [
             "ingame_id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "records_player_id_players_id_fk": {
           "name": "records_player_id_players_id_fk",
           "tableFrom": "records",
-          "tableTo": "players",
           "columnsFrom": [
             "player_id"
           ],
+          "tableTo": "players",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -185,8 +183,9 @@
   },
   "enums": {},
   "_meta": {
-    "schemas": {},
     "tables": {},
     "columns": {}
-  }
+  },
+  "id": "bce4a88f-51eb-43af-995f-11060ed3a688",
+  "prevId": "00000000-0000-0000-0000-000000000000"
 }
