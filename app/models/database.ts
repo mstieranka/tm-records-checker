@@ -7,4 +7,3 @@ const sqlite = new Database(resolveSync('./data/sqlite.db', process.cwd()), {
   readwrite: true,
 });
 export const db = drizzle(sqlite);
-git
