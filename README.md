@@ -2,7 +2,14 @@
 
 Use this tool to get notified (via ntfy.sh, by getting a message in the standard terminal output or in a management UI) if one of your Trackmania (2020) maps uploaded on Trackmania Exchange gets a new top 10 record.
 
-You will need `data/config.json`:
+> [!NOTE]
+> I'm using this for my purposes only so the implementation is a bit lacking. If you make a PR, I may look at it, but functionality of this app is not guaranteed and neither is ongoing development. Thank you for understanding.
+
+## Getting started
+
+First, pull/download this repository. Then create a `data/` folder inside (this is where the config and database are stored).
+
+Inside this `data/` folder, create a `config.json` file. It looks something like this:
 
 ```json
 {
@@ -38,12 +45,15 @@ You will need `data/config.json`:
 }
 ```
 
-The `api` section contains parameters for the APIs that are used to access the relevant data. `tmx` contains information related to Trackmania Exchange, specifically the ID of the user whose maps are to be checked, `tmBasic` contains your Ubisoft login information (used to access map records) and `tmOAuth` requires a special client ID and secret.
+Config options:
+* `baseUrl` *[required]* - the URL for the application, this is used in push notifications and the login process
+* `api` *[required]* - parameters for the APIs that are used to access the relevant data
+  *  `tmx` *[required]* - contains information related to Trackmania Exchange, specifically the ID of the user whose maps are to be checked
+  *  `tmBasic` *[required]* - contains your Ubisoft login information (used to access map records)
+  *  `tmOAuth` *[required]* - requires a special client ID and secret; it's needed in order to show display names (e.g. `playerTM` instead of `bf64ca65-f1da-4662-b827-e84fb59b821f`), because Nadeo removed the endpoint from their public API (wtf?). You can learn more about how to get the ID and secret [here](https://webservices.openplanet.dev/oauth/auth#machine-to-machine-flow).
+* `githubAuth` *[required]* - this app uses the GitHub OAuth API for logging in, so you'll need a GitHub account and [an OAuth app](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app) (use `{baseUrl}/auth/callback` as the callback URL)
+  * `clientId`, `clientConfig` *[required]* - client ID and secret for the OAuth app
+  * `allowedUsers` *[required]* - the app only allows access to the people in this list, so put your or your friends' usernames here 
+* `notifications` - only [ntfy](https://ntfy.sh) is supported currently. Just create a topic with some long and random name (these are unauthenticated, so it's better to be secure) and then set that as the `topic`.
 
-These are needed in order to show display names (e.g. `playerTM` instead of `bf64ca65-f1da-4662-b827-e84fb59b821f`), because Nadeo removed the endpoint from their public API (wtf?). You can learn more about how to get them [here](https://webservices.openplanet.dev/oauth/auth#machine-to-machine-flow) and in the section below.
-
-Every option except for `notifications.ntfy` is required.
-
-Create a database using `bun db:migrate`, build using `bun build` and run using `bun start`. This worked with `Bun 1.0.30` for me.
-
-I'm using this for my purposes only so the implementation is a bit lacking, but if you do make a PR, I may look at it.
+To run the app, create a database using `bun db:migrate`, build using `bun build` and run using `bun start`. This worked with `Bun 1.0.30` for me. Alternatively, there's a Docker Compose config in this repo, so `docker compose up -d` should work.
