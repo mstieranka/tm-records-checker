@@ -78,9 +78,7 @@ export default function MapRecords() {
             </a>
           </p>
         </div>
-        <img
-          src={`https://trackmania.exchange/maps/screenshot/normal/${map.tmxId}`}
-        />
+        <img src={`https://trackmania.exchange/mapthumb/${map.tmxId}`} />
       </div>
       <div className="overflow-auto">
         <table>

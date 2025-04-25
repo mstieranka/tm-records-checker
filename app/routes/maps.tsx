@@ -41,9 +41,7 @@ export default function Maps() {
         <details key={map.ingameId} open={!allCollapse}>
           <summary>{map.tmxName ?? map.ingameName}</summary>
           <div className="grid" style={{ gridTemplateColumns: '1fr 2fr' }}>
-            <img
-              src={`https://trackmania.exchange/maps/screenshot/normal/${map.tmxId}`}
-            />
+            <img src={`https://trackmania.exchange/mapthumb/${map.tmxId}`} />
             <div>
               <p>
                 <strong>Author time:</strong> {formatTime(map.authorTimeMs)}
