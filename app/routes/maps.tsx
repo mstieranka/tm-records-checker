@@ -40,8 +40,11 @@ export default function Maps() {
       {mapList.map((map) => (
         <details key={map.ingameId} open={!allCollapse}>
           <summary>{map.tmxName ?? map.ingameName}</summary>
-          <div className="grid" style={{ gridTemplateColumns: '1fr 2fr' }}>
-            <img src={`https://trackmania.exchange/mapthumb/${map.tmxId}`} />
+          <div className="grid" style={{ gridTemplateColumns: '210px 2fr' }}>
+            <img
+              src={`https://trackmania.exchange/mapimage/${map.tmxId}`}
+              style={{ height: '200px', width: '200px', objectFit: 'contain' }}
+            />
             <div>
               <p>
                 <strong>Author time:</strong> {formatTime(map.authorTimeMs)}

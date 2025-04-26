@@ -8,35 +8,51 @@ export interface TmxApiConfig {
 
 export interface TmxMap extends Object {
   /** TMX map ID */
-  TrackID: number;
+  MapId: number;
 
   /** Map name on TMX */
   Name: string;
 
   /** Nadeo map ID */
-  TrackUID: string;
+  MapUid: string;
 
   /** Map name in game */
   GbxMapName: string;
 
-  /** Author time in ms */
-  AuthorTime: number;
+  /** Medals in ms */
+  Medals: {
+    Author: number;
+    // Gold: number;
+    // Silver: number;
+    // Bronze: number;
+  };
 
   UploadedAt: string;
   UpdatedAt: string;
 }
 
-const TMX_BASE_URL = 'https://trackmania.exchange';
-const TMX_SEARCH_LIMIT = 100;
-const getTmxSearchUrl = (authorId: number) =>
-  `${TMX_BASE_URL}/mapsearch2/search?api=on&limit=${TMX_SEARCH_LIMIT}&authorId=${authorId}`;
+const TMX_BASE_URL = 'https://trackmania.exchange/api';
+function getTmxSearchUrl(authorId: number) {
+  return `${TMX_BASE_URL}/maps?fields=${encodeURIComponent(
+    [
+      'MapId',
+      'Name',
+      'MapUid',
+      'GbxMapName',
+      'Medals.Author',
+      'UploadedAt',
+      'UpdatedAt',
+    ].join(',')
+  )}&authoruserid=${authorId}`;
+}
 
 export async function getTmxMaps(
   searchParams: TmxSearchParams,
   userAgent: string
 ) {
-  console.log('Retrieving map list');
-  const mapListResponse = await fetch(getTmxSearchUrl(searchParams.userId), {
+  const url = getTmxSearchUrl(searchParams.userId);
+  console.log('Retrieving map list', url);
+  const mapListResponse = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
       'User-Agent': userAgent,
@@ -47,17 +63,32 @@ export async function getTmxMaps(
       `Failed to retrieve map list: ${mapListResponse.statusText}`
     );
   }
-  const mapList = (await mapListResponse.json()) as {
-    results: TmxMap[];
-    totalItemCount: number;
+  let pageData = (await mapListResponse.json()) as {
+    Results: TmxMap[];
+    More: boolean;
   };
-  if (mapList.results.length < mapList.totalItemCount) {
-    console.error(
-      `Expected ${mapList.totalItemCount} maps, got ${mapList.results.length}`
-    );
-  } else {
-    console.log(`Received map list with ${mapList.results.length} items`);
+  const results: TmxMap[] = pageData.Results;
+  console.log(`Found ${results.length} maps`);
+  while (pageData.More) {
+    const lastMapId = pageData.Results[pageData.Results.length - 1].MapId;
+    const nextPageResponse = await fetch(`${url}&after=${lastMapId}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': userAgent,
+      },
+    });
+    if (!nextPageResponse.ok) {
+      throw new Error(
+        `Failed to retrieve map list: ${nextPageResponse.statusText}`
+      );
+    }
+    pageData = (await nextPageResponse.json()) as {
+      Results: TmxMap[];
+      More: boolean;
+    };
+    results.push(...pageData.Results);
+    console.log(`Found ${results.length} maps`);
   }
 
-  return mapList.results;
+  return results;
 }

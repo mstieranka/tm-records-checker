@@ -18,11 +18,11 @@ export async function refetchTmxMaps() {
     .insert(maps)
     .values(
       tmxMaps.map((map) => ({
-        tmxId: map.TrackID,
+        tmxId: map.MapId,
         tmxName: map.Name,
-        ingameId: map.TrackUID,
+        ingameId: map.MapUid,
         ingameName: map.GbxMapName,
-        authorTimeMs: map.AuthorTime,
+        authorTimeMs: map.Medals.Author,
         uploadedAt: map.UploadedAt,
         updatedAt: map.UpdatedAt,
       }))
