@@ -1,13 +1,13 @@
-import { ActionFunctionArgs, LoaderFunctionArgs, json } from '@remix-run/node';
+import { ActionFunctionArgs, LoaderFunctionArgs, json } from 'react-router';
 import { pollTask, tasks } from '../core/tasks.server';
 import {
   Form,
-  MetaFunction,
   useActionData,
   useLoaderData,
   useNavigation,
-} from '@remix-run/react';
-import { authenticator } from '~/services/auth.server';
+} from 'react-router';
+import type { MetaFunction } from 'react-router';
+import { isAuthenticated } from '~/services/auth.server';
 import { ClockPlayIcon, ClockStopIcon, PlayIcon } from '~/assets/Icons';
 
 export const meta: MetaFunction = () => {
@@ -15,7 +15,7 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  await authenticator.isAuthenticated(request, {
+  await isAuthenticated(request, {
     failureRedirect: '/login',
   });
 
@@ -25,7 +25,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  await authenticator.isAuthenticated(request, {
+  await isAuthenticated(request, {
     failureRedirect: '/login',
   });
 

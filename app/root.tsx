@@ -1,26 +1,25 @@
-import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node';
-import { json } from '@remix-run/node';
+import type { LinksFunction, LoaderFunctionArgs } from 'react-router';
+import { json } from 'react-router';
 import {
   Form,
   Links,
-  LiveReload,
   Meta,
-  MetaFunction,
   Outlet,
   Scripts,
   useLoaderData,
-} from '@remix-run/react';
+} from 'react-router';
+import type { MetaFunction } from 'react-router';
 import { User } from './models/auth';
-import { authenticator } from './services/auth.server';
+import { isAuthenticated } from './services/auth.server';
 import { commitSession, getSession } from './services/session.server';
 
-import appStylesHref from '@picocss/pico/css/pico.min.css';
+import appStylesHref from '@picocss/pico/css/pico.min.css?url';
 import favicon16 from './assets/favicon-16x16.png';
 import favicon192 from './assets/favicon-192x192.png';
 import favicon32 from './assets/favicon-32x32.png';
 import favicon96 from './assets/favicon-96x96.png';
 import faviconIco from './assets/favicon.ico';
-import customStyles from './root.css';
+import customStyles from './root.css?url';
 
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: appStylesHref },
@@ -55,20 +54,20 @@ export const links: LinksFunction = () => [
 
 export async function loader({ request }: LoaderFunctionArgs) {
   let session = await getSession(request.headers.get('cookie'));
-  let error = session.get(authenticator.sessionErrorKey);
+  let error = session.get('error');
   if (error) {
     return json(
       { error },
       {
         headers: {
-          'Set-Cookie': await commitSession(session), // You must commit the session whenever you read a flash
+          'Set-Cookie': await commitSession(session),
         },
       }
     );
   }
 
   return json({
-    auth: await authenticator.isAuthenticated(request),
+    auth: await isAuthenticated(request),
   });
 }
 
@@ -169,7 +168,6 @@ export default function Root() {
         )}
 
         <Scripts />
-        <LiveReload />
       </body>
     </html>
   );

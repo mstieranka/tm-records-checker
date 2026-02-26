@@ -1,7 +1,8 @@
-import { LoaderFunctionArgs, json } from '@remix-run/node';
-import { MetaFunction, useLoaderData } from '@remix-run/react';
+import { LoaderFunctionArgs, json } from 'react-router';
+import { useLoaderData } from 'react-router';
+import type { MetaFunction } from 'react-router';
 import { getMapInfo } from '~/models/maps.server';
-import { authenticator } from '~/services/auth.server';
+import { isAuthenticated } from '~/services/auth.server';
 import { formatTime, formatTimestamp } from '~/utils';
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
@@ -18,7 +19,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 };
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  await authenticator.isAuthenticated(request, {
+  await isAuthenticated(request, {
     failureRedirect: '/login',
   });
 

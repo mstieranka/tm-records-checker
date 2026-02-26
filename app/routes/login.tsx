@@ -1,6 +1,7 @@
-import { json, LoaderFunctionArgs } from '@remix-run/node';
-import { Form, MetaFunction, useLoaderData } from '@remix-run/react';
-import { authenticator } from '~/services/auth.server';
+import { json, LoaderFunctionArgs } from 'react-router';
+import { Form, useLoaderData } from 'react-router';
+import type { MetaFunction } from 'react-router';
+import { isAuthenticated } from '~/services/auth.server';
 import { commitSession, getSession } from '~/services/session.server';
 
 export const meta: MetaFunction = () => {
@@ -13,7 +14,7 @@ export default function Screen() {
   return (
     <main className="container-fluid">
       {data?.error ? (
-        <p>{data.error.message}</p>
+        <p>{data.error.message ?? data.error}</p>
       ) : (
         <Form action="/auth/github" method="post">
           <button>Login with GitHub</button>
@@ -25,19 +26,19 @@ export default function Screen() {
 
 export async function loader({ request }: LoaderFunctionArgs) {
   let session = await getSession(request.headers.get('cookie'));
-  let error = session.get(authenticator.sessionErrorKey);
+  let error = session.get('error');
   if (error) {
     return json(
       { error },
       {
         headers: {
-          'Set-Cookie': await commitSession(session), // You must commit the session whenever you read a flash
+          'Set-Cookie': await commitSession(session),
         },
       }
     );
   }
 
-  return await authenticator.isAuthenticated(request, {
+  return await isAuthenticated(request, {
     successRedirect: '/',
   });
 }

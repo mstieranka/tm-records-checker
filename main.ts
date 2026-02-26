@@ -1,25 +1,20 @@
-import { createRequestHandler } from '@remix-run/express';
-import { ServerBuild, broadcastDevReady } from '@remix-run/node';
+import { createRequestHandler } from '@react-router/express';
 import express from 'express';
 import cron from 'node-cron';
 import { tasks } from '~/core/tasks.server.js';
 
-// Run Remix server
+// Run server
 
-// notice that the result of `remix build` is "just a module"
-import * as built from './build/index.js';
-const build = built as unknown as ServerBuild;
+// notice that the result of `react-router build` is "just a module"
+const build = await import('./build/server/index.js');
 
 const app = express();
-app.use(express.static('public'));
+app.use(express.static('build/client'));
 
 // and your app is "just a request handler"
 app.all('*', createRequestHandler({ build }));
 
 app.listen(3000, () => {
-  if (process.env.NODE_ENV === 'development' && build.mode === 'development') {
-    broadcastDevReady(build);
-  }
   console.log('App listening on http://localhost:3000');
 
   // Schedule tasks

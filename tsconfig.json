@@ -1,16 +1,22 @@
 {
-  "include": ["remix.env.d.ts", "pushbullet.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": [
+    "pushbullet.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".react-router/types/**/*"
+  ],
   "compilerOptions": {
     // add Bun type definitions
-    "types": ["bun-types"],
+    "types": ["bun-types", "@react-router/node", "vite/client"],
 
     "paths": {
       "~/*": ["./app/*"]
     },
     "baseUrl": ".",
+    "rootDirs": [".", "./.react-router/types"],
 
     // enable latest features
-    "lib": ["esnext"],
+    "lib": ["esnext", "DOM", "DOM.Iterable"],
     "module": "esnext",
     "target": "esnext",
 
@@ -19,8 +25,6 @@
     "noEmit": true,
     "allowImportingTsExtensions": true,
     "moduleDetection": "force",
-    // if TS 4.x or earlier
-    // "moduleResolution": "nodenext",
 
     "jsx": "react-jsx", // support JSX
     "allowJs": true, // allow importing `.js` from `.ts`

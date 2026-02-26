@@ -1,4 +1,4 @@
-import { createCookieSessionStorage } from '@remix-run/node';
+import { createCookieSessionStorage } from 'react-router';
 
 // export the whole sessionStorage object
 export let sessionStorage = createCookieSessionStorage({
