@@ -1,4 +1,4 @@
-import { json, LoaderFunctionArgs } from 'react-router';
+import { data, LoaderFunctionArgs } from 'react-router';
 import { Form, useLoaderData } from 'react-router';
 import type { MetaFunction } from 'react-router';
 import { isAuthenticated } from '~/services/auth.server';
@@ -9,12 +9,12 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Screen() {
-  const data = useLoaderData<{ error: any } | undefined>();
+  const loaderData = useLoaderData<{ error: any } | undefined>();
 
   return (
     <main className="container-fluid">
-      {data?.error ? (
-        <p>{data.error.message ?? data.error}</p>
+      {loaderData?.error ? (
+        <p>{loaderData.error.message ?? loaderData.error}</p>
       ) : (
         <Form action="/auth/github" method="post">
           <button>Login with GitHub</button>
@@ -28,7 +28,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   let session = await getSession(request.headers.get('cookie'));
   let error = session.get('error');
   if (error) {
-    return json(
+    return data(
       { error },
       {
         headers: {

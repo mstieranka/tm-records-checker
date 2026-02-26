@@ -4,4 +4,14 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
   plugins: [reactRouter(), tsconfigPaths()],
+  build: {
+    target: 'esnext',
+    rollupOptions: {
+      external: [/^bun(:|$)/],
+    },
+  },
+  ssr: {
+    external: ['bun:sqlite'],
+    target: 'node',
+  },
 });

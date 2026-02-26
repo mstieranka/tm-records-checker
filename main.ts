@@ -1,4 +1,5 @@
 import { createRequestHandler } from '@react-router/express';
+import type { ServerBuild } from 'react-router';
 import express from 'express';
 import cron from 'node-cron';
 import { tasks } from '~/core/tasks.server.js';
@@ -6,7 +7,9 @@ import { tasks } from '~/core/tasks.server.js';
 // Run server
 
 // notice that the result of `react-router build` is "just a module"
-const build = await import('./build/server/index.js');
+const build = (await import(
+  './build/server/index.js'
+)) as unknown as ServerBuild;
 
 const app = express();
 app.use(express.static('build/client'));

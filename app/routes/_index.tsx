@@ -1,4 +1,4 @@
-import { LoaderFunctionArgs, json } from 'react-router';
+import { LoaderFunctionArgs } from 'react-router';
 import { useLoaderData } from 'react-router';
 import type { MetaFunction } from 'react-router';
 import { getLatestRecords } from '~/models/records.server';
@@ -14,7 +14,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     failureRedirect: '/login',
   });
 
-  return json({ records: await getLatestRecords() });
+  return { records: await getLatestRecords() };
 }
 
 export default function Index() {

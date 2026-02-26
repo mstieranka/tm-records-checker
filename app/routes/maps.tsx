@@ -1,6 +1,6 @@
 import { useLoaderData } from 'react-router';
 import type { MetaFunction } from 'react-router';
-import { LoaderFunctionArgs, json } from 'react-router';
+import { LoaderFunctionArgs } from 'react-router';
 import { getMaps } from '~/models/maps.server';
 import { useState } from 'react';
 import { isAuthenticated } from '~/services/auth.server';
@@ -15,7 +15,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     failureRedirect: '/login',
   });
 
-  return json({ mapList: await getMaps() });
+  return { mapList: await getMaps() };
 }
 
 export default function Maps() {

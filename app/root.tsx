@@ -1,5 +1,5 @@
 import type { LinksFunction, LoaderFunctionArgs } from 'react-router';
-import { json } from 'react-router';
+import { data } from 'react-router';
 import {
   Form,
   Links,
@@ -56,7 +56,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   let session = await getSession(request.headers.get('cookie'));
   let error = session.get('error');
   if (error) {
-    return json(
+    return data(
       { error },
       {
         headers: {
@@ -66,9 +66,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
     );
   }
 
-  return json({
+  return {
     auth: await isAuthenticated(request),
-  });
+  };
 }
 
 function NavLinks() {
