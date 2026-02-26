@@ -1,32 +1,33 @@
-import { LoaderFunctionArgs, json } from '@remix-run/node';
-import { MetaFunction, useLoaderData } from '@remix-run/react';
+import { LoaderFunctionArgs, data } from 'react-router';
+import { useLoaderData } from 'react-router';
+import type { MetaFunction } from 'react-router';
 import { getMapInfo } from '~/models/maps.server';
-import { authenticator } from '~/services/auth.server';
+import { isAuthenticated } from '~/services/auth.server';
 import { formatTime, formatTimestamp } from '~/utils';
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  if (!data || 'error' in data) {
+export const meta: MetaFunction<typeof loader> = ({ data: loaderData }) => {
+  if (!loaderData || 'error' in loaderData) {
     return [{ title: 'Error | TM Records Checker' }];
   }
   return [
     {
       title: `${
-        data.mapInfo?.tmxName ?? data.mapInfo?.ingameName
+        loaderData.mapInfo?.tmxName ?? loaderData.mapInfo?.ingameName
       } | TM Records Checker`,
     },
   ];
 };
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  await authenticator.isAuthenticated(request, {
+  await isAuthenticated(request, {
     failureRedirect: '/login',
   });
 
   if (!params.ingameId) {
-    return json({ error: 'Invalid map ID' }, { status: 400 });
+    return data({ error: 'Invalid map ID' }, { status: 400 });
   }
 
-  return json({ mapInfo: await getMapInfo(params.ingameId) });
+  return { mapInfo: await getMapInfo(params.ingameId) };
 }
 
 export default function MapRecords() {

@@ -1,22 +1,22 @@
-import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
+import { ActionFunctionArgs, LoaderFunctionArgs } from 'react-router';
 import {
   Form,
-  MetaFunction,
   useActionData,
   useLoaderData,
   useNavigation,
-} from '@remix-run/react';
+} from 'react-router';
+import type { MetaFunction } from 'react-router';
 import { useState } from 'react';
 import { EyeIcon, EyeOffIcon, ReloadIcon, SaveIcon } from '~/assets/Icons';
 import { getConfig, reloadConfig, saveConfig } from '~/core/config.server';
-import { authenticator } from '~/services/auth.server';
+import { isAuthenticated } from '~/services/auth.server';
 
 export const meta: MetaFunction = () => {
   return [{ title: 'Settings | TM Records Checker' }];
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  await authenticator.isAuthenticated(request, {
+  await isAuthenticated(request, {
     failureRedirect: '/login',
   });
 
@@ -24,7 +24,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  await authenticator.isAuthenticated(request, {
+  await isAuthenticated(request, {
     failureRedirect: '/login',
   });
 

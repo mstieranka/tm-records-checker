@@ -1,13 +1,13 @@
-import { ActionFunctionArgs, LoaderFunctionArgs, json } from '@remix-run/node';
+import { ActionFunctionArgs, LoaderFunctionArgs } from 'react-router';
 import { pollTask, tasks } from '../core/tasks.server';
 import {
   Form,
-  MetaFunction,
   useActionData,
   useLoaderData,
   useNavigation,
-} from '@remix-run/react';
-import { authenticator } from '~/services/auth.server';
+} from 'react-router';
+import type { MetaFunction } from 'react-router';
+import { isAuthenticated } from '~/services/auth.server';
 import { ClockPlayIcon, ClockStopIcon, PlayIcon } from '~/assets/Icons';
 
 export const meta: MetaFunction = () => {
@@ -15,17 +15,17 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  await authenticator.isAuthenticated(request, {
+  await isAuthenticated(request, {
     failureRedirect: '/login',
   });
 
-  return json({
+  return {
     tasks: tasks.map(({ name, cron, polling }) => ({ name, cron, polling })),
-  });
+  };
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  await authenticator.isAuthenticated(request, {
+  await isAuthenticated(request, {
     failureRedirect: '/login',
   });
 
@@ -36,11 +36,11 @@ export async function action({ request }: ActionFunctionArgs) {
   console.log(formData);
 
   if (!name) {
-    return json({ name: null, success: false });
+    return { name: null, success: false };
   }
   const task = tasks.find((task) => task.name === name);
   if (!task) {
-    return json({ name, success: false });
+    return { name, success: false };
   }
 
   switch (action) {
@@ -50,9 +50,9 @@ export async function action({ request }: ActionFunctionArgs) {
         await task.task();
       } catch (error) {
         console.error('Error running task', name, error);
-        return json({ name, success: false });
+        return { name, success: false };
       }
-      return json({ name, success: true });
+      return { name, success: true };
     }
     case 'poll': {
       console.log('Toggling polling for task', name, 'from', task.polling);
@@ -63,10 +63,10 @@ export async function action({ request }: ActionFunctionArgs) {
         task.polling = false;
       }
 
-      return json({ name, success: true });
+      return { name, success: true };
     }
     default:
-      return json({ name: null, success: false });
+      return { name: null, success: false };
   }
 }
 

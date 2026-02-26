@@ -1,8 +1,7 @@
 FROM oven/bun:alpine
 
 WORKDIR /app
-COPY package.json ./
-COPY bun.lockb ./
+COPY package.json pnpm-lock.yaml ./
 RUN bun install
 
 COPY ./ ./
