@@ -1,19 +1,26 @@
 {
-  "include": ["remix.env.d.ts", "pushbullet.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ],
   "compilerOptions": {
-    // add Bun type definitions
-    "types": ["bun-types"],
-
+    "types": [
+      "bun-types",
+      "@remix-run/node",
+      "vite/client"
+    ],
     "paths": {
-      "~/*": ["./app/*"]
+      "~/*": [
+        "./app/*"
+      ]
     },
     "baseUrl": ".",
-
     // enable latest features
-    "lib": ["esnext"],
+    "lib": [
+      "esnext"
+    ],
     "module": "esnext",
     "target": "esnext",
-
     // if TS 5.x+
     "moduleResolution": "bundler",
     "noEmit": true,
@@ -21,13 +28,11 @@
     "moduleDetection": "force",
     // if TS 4.x or earlier
     // "moduleResolution": "nodenext",
-
     "jsx": "react-jsx", // support JSX
     "allowJs": true, // allow importing `.js` from `.ts`
     "esModuleInterop": true, // allow default imports for CommonJS modules
     "resolveJsonModule": true,
     "isolatedModules": true,
-
     // best practices
     "strict": true,
     "forceConsistentCasingInFileNames": true,

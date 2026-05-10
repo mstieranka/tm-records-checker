@@ -1,4 +1,3 @@
-// import { BasicAuthData } from './basicApi';
 import { BasicAuthData } from "./basicApi.types";
 import { NotificationsConfig } from "./notifier";
 import { OauthData } from "./oauthApi";

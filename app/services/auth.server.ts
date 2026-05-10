@@ -14,7 +14,7 @@ let gitHubStrategy = new GitHubStrategy<User>(
     clientSecret: getConfig().githubAuth.clientSecret,
     redirectURI:
       process.env.NODE_ENV === "development"
-        ? "http://127.0.0.1:3000/auth/callback"
+        ? "http://localhost:3000/auth/callback"
         : `${getConfig().baseUrl}/auth/callback`,
   },
   async ({ profile }) => {

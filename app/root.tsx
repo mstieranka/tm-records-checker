@@ -1,17 +1,17 @@
 import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Form, Links, LiveReload, Meta, Outlet, Scripts, useLoaderData } from "@remix-run/react";
+import { Form, Links, Meta, Outlet, Scripts, useLoaderData } from "@remix-run/react";
 import { User } from "./models/auth";
 import { authenticator } from "./services/auth.server";
 import { commitSession, getSession } from "./services/session.server";
 
-import appStylesHref from "@picocss/pico/css/pico.min.css";
+import appStylesHref from "@picocss/pico/css/pico.min.css?url";
 import favicon16 from "./assets/favicon-16x16.png";
 import favicon192 from "./assets/favicon-192x192.png";
 import favicon32 from "./assets/favicon-32x32.png";
 import favicon96 from "./assets/favicon-96x96.png";
 import faviconIco from "./assets/favicon.ico";
-import customStyles from "./root.css";
+import customStyles from "./root.css?url";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: appStylesHref },
@@ -160,7 +160,6 @@ export default function Root() {
         )}
 
         <Scripts />
-        <LiveReload />
       </body>
     </html>
   );
