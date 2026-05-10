@@ -1,9 +1,19 @@
-import { Form, useActionData, useLoaderData, useNavigation } from "react-router";
-import type { Route } from "./+types/settings";
+import { Form, useLoaderData, useNavigation } from "react-router";
 import { useState } from "react";
-import { EyeIcon, EyeOffIcon, ReloadIcon, SaveIcon } from "~/assets/Icons";
+import {
+  IconDeviceFloppy,
+  IconEye,
+  IconEyeOff,
+  IconLoader2,
+  IconReload,
+} from "@tabler/icons-react";
+import type { Route } from "./+types/settings";
 import { getConfig, reloadConfig, saveConfig } from "~/core/config.server";
 import { requireUser } from "~/auth/session.server";
+import { PageContainer } from "~/components/PageContainer";
+import { Button } from "~/components/ui/button";
+import { Textarea } from "~/components/ui/textarea";
+import { toast } from "sonner";
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: "Settings | TM Records Checker" }];
@@ -11,106 +21,106 @@ export const meta: Route.MetaFunction = () => {
 
 export async function loader({ request }: Route.LoaderArgs) {
   await requireUser(request);
-
   return getConfig();
+}
+
+enum ActionType {
+  Reload = "reload",
+  Save = "save",
 }
 
 export async function action({ request }: Route.ActionArgs) {
   await requireUser(request);
 
   const formData = await request.formData();
-  const action = formData.get("action");
-
-  console.log("Action:", action);
+  const action = formData.get("action")?.toString() as ActionType | null;
 
   switch (action) {
-    case "reload": {
-      console.log("Reloading config");
+    case ActionType.Reload: {
       await reloadConfig();
-      return { success: true };
+      return { action, success: true };
     }
-    case "save": {
+    case ActionType.Save: {
       const config = JSON.parse(formData.get("config") as string);
-      console.log("Saving config");
       await saveConfig(config);
-      return { success: true };
+      return { action, success: true };
     }
     default:
-      return { success: false };
+      return { action, success: false };
   }
+}
+
+export async function clientAction({ serverAction }: Route.ClientActionArgs) {
+  const result = await serverAction();
+
+  if (result.action === ActionType.Reload) {
+    if (result.success) {
+      toast.success("Config reloaded successfully.");
+    } else {
+      toast.error("Failed to reload config.");
+    }
+  } else if (result.action === ActionType.Save) {
+    if (result.success) {
+      toast.success("Config saved and reloaded successfully.");
+    } else {
+      toast.error("Failed to save and reload config.");
+    }
+  }
+
+  return result;
 }
 
 export default function Settings() {
   const config = useLoaderData<typeof loader>();
-  const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
   const [showConfig, setShowConfig] = useState(false);
+  const isPending = navigation.state === "submitting";
+  const activeAction = isPending ? navigation.formData?.get("action")?.toString() : null;
 
   return (
-    <main className="container">
-      <Form method="post" style={{ margin: "1rem auto" }}>
-        <div className="flex-desktop gap middle">
-          <h1 style={{ flexGrow: "1", flexShrink: "1", flexBasis: "0" }}>Settings</h1>
-          <div className="grid flex-grow" style={{ marginBottom: "1rem" }}>
-            <button
-              className="outline flex gap middle mb-0"
-              type="button"
-              onClick={() => setShowConfig(!showConfig)}
+    <PageContainer>
+      <Form method="post" className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center">
+          <h1 className="font-heading text-2xl font-semibold flex-1">Settings</h1>
+          <div className="flex flex-wrap gap-2">
+            <Button type="button" variant="outline" onClick={() => setShowConfig(!showConfig)}>
+              {showConfig ? <IconEyeOff /> : <IconEye />}
+              {showConfig ? "Hide config" : "Show config"}
+            </Button>
+            <Button
+              type="submit"
+              variant="outline"
+              name="action"
+              value={ActionType.Reload}
+              disabled={isPending}
             >
-              {showConfig ? (
-                <>
-                  <EyeOffIcon /> Hide config
-                </>
+              {activeAction === ActionType.Reload ? (
+                <IconLoader2 className="animate-spin" />
               ) : (
-                <>
-                  <EyeIcon /> Show config
-                </>
+                <IconReload />
               )}
-            </button>
-            <button
-              className="outline flex gap middle mb-0"
-              type="submit"
-              name="action"
-              value="reload"
-              style={{ flexGrow: 0 }}
-            >
-              <ReloadIcon /> Reload config
-            </button>
-            <button
-              className="outline flex gap middle mb-0"
-              type="submit"
-              name="action"
-              value="save"
-              style={{ flexGrow: 0 }}
-            >
-              <SaveIcon /> Save and reload
-            </button>
+              Reload config
+            </Button>
+            <Button type="submit" name="action" value={ActionType.Save} disabled={isPending}>
+              {activeAction === ActionType.Save ? (
+                <IconLoader2 className="animate-spin" />
+              ) : (
+                <IconDeviceFloppy />
+              )}
+              Save and reload
+            </Button>
           </div>
         </div>
 
-        {navigation.formData !== undefined ? (
-          <p style={{ marginBottom: "1rem" }}>Waiting for server response...</p>
-        ) : (
-          actionData !== undefined && (
-            <p style={{ marginBottom: "1rem" }}>
-              <strong>Success:</strong> {actionData.success ? "Yes" : "No"}
-            </p>
-          )
-        )}
-
-        <div style={{ marginBottom: "1rem" }}>
-          <textarea
-            id="config"
-            name="config"
-            defaultValue={JSON.stringify(config, null, 2)}
-            style={{
-              fontFamily: "monospace",
-              height: "70vh",
-              filter: showConfig ? "" : "blur(0.5rem)",
-            }}
-          />
-        </div>
+        <Textarea
+          key={JSON.stringify(config)}
+          id="config"
+          name="config"
+          defaultValue={JSON.stringify(config, null, 2)}
+          className="font-mono h-[70vh]"
+          style={showConfig ? undefined : { filter: "blur(0.5rem)" }}
+        />
       </Form>
-    </main>
+    </PageContainer>
   );
 }

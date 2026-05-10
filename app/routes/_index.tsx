@@ -1,8 +1,17 @@
-import { useLoaderData } from "react-router";
+import { Link, useLoaderData } from "react-router";
 import type { Route } from "./+types/_index";
 import { getLatestRecords } from "~/models/records.server";
 import { requireUser } from "~/auth/session.server";
 import { formatTime, formatTimestamp } from "~/utils";
+import { PageContainer } from "~/components/PageContainer";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "~/components/ui/table";
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: "Home | TM Records Checker" }];
@@ -18,35 +27,37 @@ export default function Index() {
   const { records } = useLoaderData<typeof loader>();
 
   return (
-    <main className="container">
-      <h1>Home</h1>
-      <h2>Latest records:</h2>
-      <div className="overflow-auto">
-        <table>
-          <thead>
-            <tr>
-              <th>Map</th>
-              <th>#</th>
-              <th>Player</th>
-              <th>Time</th>
-              <th>Discovered at</th>
-            </tr>
-          </thead>
-          <tbody>
-            {records.map((record) => (
-              <tr key={record.id}>
-                <td>
-                  <a href={`/records/${record.mapId}`}>{record.mapName}</a>
-                </td>
-                <td>{record.position}</td>
-                <td>{formatTime(record.timeMs)}</td>
-                <td>{record.playerName}</td>
-                <td>{formatTimestamp(record.timestamp)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </main>
+    <PageContainer>
+      <h1 className="font-heading text-2xl font-semibold mb-6">Latest records</h1>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Map</TableHead>
+            <TableHead>#</TableHead>
+            <TableHead>Player</TableHead>
+            <TableHead>Time</TableHead>
+            <TableHead>Discovered at</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {records.map((record) => (
+            <TableRow key={record.id}>
+              <TableCell>
+                <Link
+                  to={`/records/${record.mapId}`}
+                  className="text-primary underline-offset-4 hover:underline"
+                >
+                  {record.mapName}
+                </Link>
+              </TableCell>
+              <TableCell>{record.position}</TableCell>
+              <TableCell>{record.playerName}</TableCell>
+              <TableCell>{formatTime(record.timeMs)}</TableCell>
+              <TableCell>{formatTimestamp(record.timestamp)}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </PageContainer>
   );
 }

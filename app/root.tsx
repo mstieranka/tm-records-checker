@@ -1,19 +1,36 @@
-import { data } from "react-router";
-import { Form, Links, Meta, Outlet, Scripts, useLoaderData } from "react-router";
+import { data, Link, useLocation } from "react-router";
+import { Links, Meta, Outlet, Scripts, useLoaderData } from "react-router";
+import { IconMenu2 } from "@tabler/icons-react";
+import { ThemeProvider } from "next-themes";
 import type { Route } from "./+types/root";
 import { AUTH_ERROR_KEY, commitSession, getSession, getUser } from "./auth/session.server";
+import { ThemeToggle } from "~/components/ThemeToggle";
+import { Button } from "~/components/ui/button";
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+} from "~/components/ui/navigation-menu";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "~/components/ui/sheet";
+import { Toaster } from "~/components/ui/sonner";
 
-import appStylesHref from "@picocss/pico/css/pico.min.css?url";
 import favicon16 from "./assets/favicon-16x16.png";
 import favicon192 from "./assets/favicon-192x192.png";
 import favicon32 from "./assets/favicon-32x32.png";
 import favicon96 from "./assets/favicon-96x96.png";
 import faviconIco from "./assets/favicon.ico";
-import customStyles from "./root.css?url";
+import css from "./root.css?url";
 
 export const links: Route.LinksFunction = () => [
-  { rel: "stylesheet", href: appStylesHref },
-  { rel: "stylesheet", href: customStyles },
+  { rel: "stylesheet", href: css },
   {
     rel: "icon",
     type: "image/png",
@@ -50,7 +67,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       { error },
       {
         headers: {
-          "Set-Cookie": await commitSession(session), // You must commit the session whenever you read a flash
+          "Set-Cookie": await commitSession(session),
         },
       },
     );
@@ -61,33 +78,21 @@ export async function loader({ request }: Route.LoaderArgs) {
   };
 }
 
-function NavLinks() {
-  return (
-    <>
-      <li>
-        <a href="/">Home</a>
-      </li>
-      <li>
-        <a href="/maps">Maps</a>
-      </li>
-      <li>
-        <a href="/tasks">Tasks</a>
-      </li>
-      <li>
-        <a href="/settings">Settings</a>
-      </li>
-      <li>
-        <a href="/auth/logout">Logout</a>
-      </li>
-    </>
-  );
-}
+const NAV_LINKS = [
+  { to: "/", label: "Home" },
+  { to: "/maps", label: "Maps" },
+  { to: "/tasks", label: "Tasks" },
+  { to: "/settings", label: "Settings" },
+  { to: "/auth/logout", label: "Logout" },
+];
 
 export default function Root() {
   const data = useLoaderData<typeof loader>();
+  const isAuthed = "auth" in data && !!data.auth;
+  const location = useLocation();
 
   return (
-    <html>
+    <html suppressHydrationWarning>
       <head>
         <link rel="icon" href="data:image/x-icon;base64,AA" />
         <meta charSet="utf-8" />
@@ -96,67 +101,78 @@ export default function Root() {
         <Links />
       </head>
       <body>
-        <nav className="container-fluid">
-          <ul>
-            <li>
-              <a href="/">TM Records Checker</a>
-            </li>
-          </ul>
-          {"auth" in data && !!data.auth && (
-            <>
-              <ul className="mobile-only">
-                <li>
-                  <details className="dropdown">
-                    <summary className="no-arrow">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="icon icon-tabler icon-tabler-menu"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M4 8l16 0" />
-                        <path d="M4 16l16 0" />
-                      </svg>
-                    </summary>
-                    <ul dir="rtl">
-                      <NavLinks />
-                    </ul>
-                  </details>
-                </li>
-              </ul>
-              <ul className="desktop-only">
-                <NavLinks />
-              </ul>
-            </>
-          )}
-        </nav>
-        <Outlet />
-        {"error" in data && !!data.error && (
-          <footer className="container-fluid">
-            <hr />
-            <Form action="/auth/logout" method="post">
-              <button
-                className="outline"
-                style={{
-                  border: 0,
-                  padding: 0,
-                  margin: 0,
-                  fontSize: "0.75rem",
-                }}
-              >
-                Logout
-              </button>
-            </Form>
-          </footer>
-        )}
-
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <header className="flex items-center justify-between gap-4 border-b px-4 py-3 md:px-6">
+            <Link to="/" className="font-heading text-base font-medium">
+              TM Records Checker
+            </Link>
+            <div className="flex items-center gap-2">
+              {isAuthed && (
+                <>
+                  <div className="hidden md:block">
+                    <NavigationMenu>
+                      <NavigationMenuList>
+                        {NAV_LINKS.map((link) => (
+                          <NavigationMenuItem key={link.to}>
+                            <NavigationMenuLink
+                              active={location.pathname === link.to}
+                              render={({ ...props }) => (
+                                <Link to={link.to} {...props}>
+                                  {link.label}
+                                </Link>
+                              )}
+                            />
+                          </NavigationMenuItem>
+                        ))}
+                      </NavigationMenuList>
+                    </NavigationMenu>
+                  </div>
+                  <div className="md:hidden">
+                    <Sheet>
+                      <SheetTrigger render={<Button variant="ghost" size="icon-sm" />}>
+                        <IconMenu2 />
+                        <span className="sr-only">Open menu</span>
+                      </SheetTrigger>
+                      <SheetContent side="right">
+                        <SheetHeader>
+                          <SheetTitle>Menu</SheetTitle>
+                        </SheetHeader>
+                        <nav className="flex flex-col gap-1 px-4 pb-4">
+                          {NAV_LINKS.map((link) => (
+                            <SheetClose
+                              key={link.to}
+                              render={
+                                <Link
+                                  to={link.to}
+                                  className="rounded-md px-3 py-2 text-sm hover:bg-muted"
+                                >
+                                  {link.label}
+                                </Link>
+                              }
+                            />
+                          ))}
+                          <div className="mt-4 border-t pt-4">
+                            <ThemeToggle showLabel />
+                          </div>
+                        </nav>
+                      </SheetContent>
+                    </Sheet>
+                  </div>
+                </>
+              )}
+              <div className="hidden md:block">
+                <ThemeToggle />
+              </div>
+            </div>
+          </header>
+          <Outlet />
+          <Toaster position="top-center" />
+        </ThemeProvider>
         <Scripts />
       </body>
     </html>

@@ -3,6 +3,18 @@ import type { Route } from "./+types/records.$ingameId";
 import { getMapInfo } from "~/models/maps.server";
 import { requireUser } from "~/auth/session.server";
 import { formatTime, formatTimestamp } from "~/utils";
+import { MapExternalLinks } from "~/components/MapExternalLinks";
+import { MapThumbnail } from "~/components/MapThumbnail";
+import { PageContainer } from "~/components/PageContainer";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "~/components/ui/table";
 
 export const meta: Route.MetaFunction = ({ loaderData }) => {
   if (!loaderData || "error" in loaderData) {
@@ -23,104 +35,86 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 export default function MapRecords() {
   const data = useLoaderData<typeof loader>();
   const map = data.mapInfo;
+
   if (!map) {
     return (
-      <main className="container">
-        <h1>Map not found</h1>
-      </main>
+      <PageContainer>
+        <Alert variant="destructive">
+          <AlertTitle>Map not found</AlertTitle>
+        </Alert>
+      </PageContainer>
     );
   }
+
   return (
-    <main className="container">
-      <div
-        className="flex-mobile"
-        style={{
-          display: "flex",
-          paddingBottom: "1rem",
-          gap: "1rem",
-        }}
-      >
-        <div style={{ flexGrow: "1" }}>
-          <header style={{ margin: "1rem 0" }}>
-            <h1 style={{ margin: 0 }}>{map.tmxName ?? map.ingameName}</h1>
-          </header>
-          <p>
-            <strong>Author time:</strong> {formatTime(map.authorTimeMs)}
-          </p>
-          <p>
-            <strong>Uploaded at:</strong> {formatTimestamp(map.uploadedAt)}
-          </p>
-          {map.updatedAt !== map.uploadedAt && (
-            <p>
-              <strong>Updated at:</strong> {formatTimestamp(map.updatedAt)}
-            </p>
-          )}
-          <p className="flex gap">
-            <a className="block" href={`https://trackmania.exchange/maps/${map.tmxId}`}>
-              TMX
-            </a>
-            <a className="block" href={`https://trackmania.io/#/leaderboard/${map.ingameId}`}>
-              Trackmania.io
-            </a>
-          </p>
+    <PageContainer>
+      <div className="flex flex-col-reverse gap-6 md:flex-row md:items-start mb-8">
+        <div className="flex-1 flex flex-col gap-3 text-sm">
+          <h1 className="font-heading text-2xl font-semibold">{map.tmxName ?? map.ingameName}</h1>
+          <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
+            <dt className="text-muted-foreground">Author time</dt>
+            <dd>{formatTime(map.authorTimeMs)}</dd>
+            <dt className="text-muted-foreground">Uploaded at</dt>
+            <dd>{formatTimestamp(map.uploadedAt)}</dd>
+            {map.updatedAt !== map.uploadedAt && (
+              <>
+                <dt className="text-muted-foreground">Updated at</dt>
+                <dd>{formatTimestamp(map.updatedAt)}</dd>
+              </>
+            )}
+          </dl>
+          <MapExternalLinks tmxId={map.tmxId} ingameId={map.ingameId} />
         </div>
-        <img
-          src={`https://trackmania.exchange/mapimage/${map.tmxId}`}
-          style={{ height: "250px", objectFit: "contain" }}
+        <MapThumbnail
+          tmxId={map.tmxId}
+          name={map.tmxName ?? map.ingameName}
+          className="w-full md:w-48"
         />
       </div>
-      <div className="overflow-auto">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Player</th>
-              <th>Time</th>
-              <th>Discovered at</th>
-            </tr>
-          </thead>
-          <tbody>
-            {map.records.map((record, idx) => (
-              <tr key={record.playerName}>
-                <td>{idx + 1}</td>
-                <td>{record.playerName}</td>
-                <td>{formatTime(record.timeMs)}</td>
-                <td>
-                  {new Date(record.timestamp).toLocaleString("en-GB", {
-                    day: "numeric",
-                    month: "numeric",
-                    year: "numeric",
-                    hour12: false,
-                    hour: "numeric",
-                    minute: "numeric",
-                    second: "numeric",
-                  })}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </main>
+
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>#</TableHead>
+            <TableHead>Player</TableHead>
+            <TableHead>Time</TableHead>
+            <TableHead>Discovered at</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {map.records.map((record, idx) => (
+            <TableRow key={record.playerName}>
+              <TableCell>{idx + 1}</TableCell>
+              <TableCell>{record.playerName}</TableCell>
+              <TableCell>{formatTime(record.timeMs)}</TableCell>
+              <TableCell>{formatTimestamp(record.timestamp)}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </PageContainer>
   );
 }
 
 export function ErrorBoundary() {
   const error = useRouteError();
+
+  let title = "Error";
+  let description: string | undefined;
+
   if (isRouteErrorResponse(error)) {
-    return (
-      <main className="container">
-        <h1>{error.data.error}</h1>
-        <p>Error {error.status}</p>
-      </main>
-    );
+    title = error.data?.error ?? `Error ${error.status}`;
+    description = `Status ${error.status}`;
   } else if (error instanceof Error) {
-    return (
-      <main className="container">
-        <h1>Error</h1>
-        <p>{error.message}</p>
-      </main>
-    );
+    description = error.message;
   }
-  return <h1>Unknown Error</h1>;
+
+  return (
+    <PageContainer>
+      <Alert variant="destructive">
+        <AlertTitle>{title}</AlertTitle>
+        {description && <AlertDescription>{description}</AlertDescription>}
+      </Alert>
+    </PageContainer>
+  );
 }

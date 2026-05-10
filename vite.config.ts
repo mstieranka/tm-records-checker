@@ -1,4 +1,5 @@
 import { reactRouter } from "@react-router/dev/vite";
+import tailwindcss from "@tailwindcss/vite";
 import { spawn } from "node:child_process";
 import net from "node:net";
 import { defineConfig, type Plugin } from "vite";
@@ -37,5 +38,5 @@ export default defineConfig({
   ssr: {
     external: ["bun:sqlite", "bun"],
   },
-  plugins: [reactRouter(), cronPlugin()],
+  plugins: [tailwindcss(), reactRouter(), cronPlugin()],
 });
