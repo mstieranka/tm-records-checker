@@ -1,26 +1,26 @@
-import { createRequestHandler } from '@remix-run/express';
-import { ServerBuild, broadcastDevReady } from '@remix-run/node';
-import express from 'express';
-import cron from 'node-cron';
-import { tasks } from '~/core/tasks.server.js';
+import { createRequestHandler } from "@remix-run/express";
+import { ServerBuild, broadcastDevReady } from "@remix-run/node";
+import express from "express";
+import cron from "node-cron";
+import { tasks } from "~/core/tasks.server.js";
 
 // Run Remix server
 
 // notice that the result of `remix build` is "just a module"
-import * as built from './build/index.js';
+import * as built from "./build/index.js";
 const build = built as unknown as ServerBuild;
 
 const app = express();
-app.use(express.static('public'));
+app.use(express.static("public"));
 
 // and your app is "just a request handler"
-app.all('*', createRequestHandler({ build }));
+app.all("*", createRequestHandler({ build }));
 
 app.listen(3000, () => {
-  if (process.env.NODE_ENV === 'development' && build.mode === 'development') {
+  if (process.env.NODE_ENV === "development" && build.mode === "development") {
     broadcastDevReady(build);
   }
-  console.log('App listening on http://localhost:3000');
+  console.log("App listening on http://localhost:3000");
 
   // Schedule tasks
   for (const task of tasks) {
@@ -31,11 +31,11 @@ app.listen(3000, () => {
         task.task();
       },
       {
-        timezone: 'Europe/Prague',
+        timezone: "Europe/Prague",
         name: task.name,
         scheduled: true,
         runOnInit: false,
-      }
+      },
     );
   }
 });

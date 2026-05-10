@@ -15,17 +15,17 @@ export function formatTime(ms: number) {
   const minutes = date.getUTCMinutes();
   const seconds = date.getUTCSeconds();
   const milliseconds = date.getUTCMilliseconds();
-  return `${hours ? hours + ':' : ''}${minutes
+  return `${hours ? hours + ":" : ""}${minutes
     .toString()
-    .padStart(1, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds
+    .padStart(1, "0")}:${seconds.toString().padStart(2, "0")}.${milliseconds
     .toString()
-    .padStart(3, '0')}`;
+    .padStart(3, "0")}`;
 }
 
 export function formatTimestamp(timestamp: string) {
-  return new Date(timestamp).toLocaleString('en-US', {
-    dateStyle: 'long',
-    timeStyle: 'short',
+  return new Date(timestamp).toLocaleString("en-US", {
+    dateStyle: "long",
+    timeStyle: "short",
     hour12: false,
   });
 }
@@ -35,6 +35,6 @@ export const isTimeClose = (expiresAt: number) => {
 };
 
 export const sleep = async (timeoutMs: number) => {
-  console.log('Waiting for ' + timeoutMs / 60 / 1000 + ' minutes');
+  console.log("Waiting for " + timeoutMs / 60 / 1000 + " minutes");
   await Bun.sleep(timeoutMs);
 };

@@ -1,16 +1,16 @@
-import { LoaderFunctionArgs, json } from '@remix-run/node';
-import { MetaFunction, useLoaderData } from '@remix-run/react';
-import { getLatestRecords } from '~/models/records.server';
-import { authenticator } from '~/services/auth.server';
-import { formatTime, formatTimestamp } from '~/utils';
+import { LoaderFunctionArgs, json } from "@remix-run/node";
+import { MetaFunction, useLoaderData } from "@remix-run/react";
+import { getLatestRecords } from "~/models/records.server";
+import { authenticator } from "~/services/auth.server";
+import { formatTime, formatTimestamp } from "~/utils";
 
 export const meta: MetaFunction = () => {
-  return [{ title: 'Home | TM Records Checker' }];
+  return [{ title: "Home | TM Records Checker" }];
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await authenticator.isAuthenticated(request, {
-    failureRedirect: '/login',
+    failureRedirect: "/login",
   });
 
   return json({ records: await getLatestRecords() });

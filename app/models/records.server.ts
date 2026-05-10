@@ -1,6 +1,6 @@
-import { asc, desc, eq, sql } from 'drizzle-orm';
-import { db } from './database';
-import { maps, players, records } from './schema';
+import { asc, desc, eq, sql } from "drizzle-orm";
+import { db } from "./database";
+import { maps, players, records } from "./schema";
 
 export async function getLatestRecords() {
   return await db

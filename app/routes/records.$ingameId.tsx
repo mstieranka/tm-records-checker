@@ -1,29 +1,27 @@
-import { LoaderFunctionArgs, json } from '@remix-run/node';
-import { MetaFunction, useLoaderData } from '@remix-run/react';
-import { getMapInfo } from '~/models/maps.server';
-import { authenticator } from '~/services/auth.server';
-import { formatTime, formatTimestamp } from '~/utils';
+import { LoaderFunctionArgs, json } from "@remix-run/node";
+import { MetaFunction, useLoaderData } from "@remix-run/react";
+import { getMapInfo } from "~/models/maps.server";
+import { authenticator } from "~/services/auth.server";
+import { formatTime, formatTimestamp } from "~/utils";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  if (!data || 'error' in data) {
-    return [{ title: 'Error | TM Records Checker' }];
+  if (!data || "error" in data) {
+    return [{ title: "Error | TM Records Checker" }];
   }
   return [
     {
-      title: `${
-        data.mapInfo?.tmxName ?? data.mapInfo?.ingameName
-      } | TM Records Checker`,
+      title: `${data.mapInfo?.tmxName ?? data.mapInfo?.ingameName} | TM Records Checker`,
     },
   ];
 };
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   await authenticator.isAuthenticated(request, {
-    failureRedirect: '/login',
+    failureRedirect: "/login",
   });
 
   if (!params.ingameId) {
-    return json({ error: 'Invalid map ID' }, { status: 400 });
+    return json({ error: "Invalid map ID" }, { status: 400 });
   }
 
   return json({ mapInfo: await getMapInfo(params.ingameId) });
@@ -31,7 +29,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export default function MapRecords() {
   const data = useLoaderData<typeof loader>();
-  if ('error' in data) {
+  if ("error" in data) {
     return <h1>{data.error}</h1>;
   }
   const map = data.mapInfo;
@@ -43,13 +41,13 @@ export default function MapRecords() {
       <div
         className="flex-mobile"
         style={{
-          display: 'flex',
-          paddingBottom: '1rem',
-          gap: '1rem',
+          display: "flex",
+          paddingBottom: "1rem",
+          gap: "1rem",
         }}
       >
-        <div style={{ flexGrow: '1' }}>
-          <header style={{ margin: '1rem 0' }}>
+        <div style={{ flexGrow: "1" }}>
+          <header style={{ margin: "1rem 0" }}>
             <h1 style={{ margin: 0 }}>{map.tmxName ?? map.ingameName}</h1>
           </header>
           <p>
@@ -64,23 +62,17 @@ export default function MapRecords() {
             </p>
           )}
           <p className="flex gap">
-            <a
-              className="block"
-              href={`https://trackmania.exchange/maps/${map.tmxId}`}
-            >
+            <a className="block" href={`https://trackmania.exchange/maps/${map.tmxId}`}>
               TMX
             </a>
-            <a
-              className="block"
-              href={`https://trackmania.io/#/leaderboard/${map.ingameId}`}
-            >
+            <a className="block" href={`https://trackmania.io/#/leaderboard/${map.ingameId}`}>
               Trackmania.io
             </a>
           </p>
         </div>
         <img
           src={`https://trackmania.exchange/mapimage/${map.tmxId}`}
-          style={{ height: '250px', objectFit: 'contain' }}
+          style={{ height: "250px", objectFit: "contain" }}
         />
       </div>
       <div className="overflow-auto">
@@ -100,14 +92,14 @@ export default function MapRecords() {
                 <td>{record.playerName}</td>
                 <td>{formatTime(record.timeMs)}</td>
                 <td>
-                  {new Date(record.timestamp).toLocaleString('en-GB', {
-                    day: 'numeric',
-                    month: 'numeric',
-                    year: 'numeric',
+                  {new Date(record.timestamp).toLocaleString("en-GB", {
+                    day: "numeric",
+                    month: "numeric",
+                    year: "numeric",
                     hour12: false,
-                    hour: 'numeric',
-                    minute: 'numeric',
-                    second: 'numeric',
+                    hour: "numeric",
+                    minute: "numeric",
+                    second: "numeric",
                   })}
                 </td>
               </tr>

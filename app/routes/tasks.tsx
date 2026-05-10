@@ -1,22 +1,16 @@
-import { ActionFunctionArgs, LoaderFunctionArgs, json } from '@remix-run/node';
-import { pollTask, tasks } from '../core/tasks.server';
-import {
-  Form,
-  MetaFunction,
-  useActionData,
-  useLoaderData,
-  useNavigation,
-} from '@remix-run/react';
-import { authenticator } from '~/services/auth.server';
-import { ClockPlayIcon, ClockStopIcon, PlayIcon } from '~/assets/Icons';
+import { ActionFunctionArgs, LoaderFunctionArgs, json } from "@remix-run/node";
+import { pollTask, tasks } from "../core/tasks.server";
+import { Form, MetaFunction, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
+import { authenticator } from "~/services/auth.server";
+import { ClockPlayIcon, ClockStopIcon, PlayIcon } from "~/assets/Icons";
 
 export const meta: MetaFunction = () => {
-  return [{ title: 'Tasks | TM Records Checker' }];
+  return [{ title: "Tasks | TM Records Checker" }];
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await authenticator.isAuthenticated(request, {
-    failureRedirect: '/login',
+    failureRedirect: "/login",
   });
 
   return json({
@@ -26,12 +20,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export async function action({ request }: ActionFunctionArgs) {
   await authenticator.isAuthenticated(request, {
-    failureRedirect: '/login',
+    failureRedirect: "/login",
   });
 
   const formData = await request.formData();
-  const action = formData.get('action');
-  const name = formData.get('name');
+  const action = formData.get("action");
+  const name = formData.get("name");
 
   console.log(formData);
 
@@ -44,18 +38,18 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   switch (action) {
-    case 'run': {
-      console.log('Running task', name);
+    case "run": {
+      console.log("Running task", name);
       try {
         await task.task();
       } catch (error) {
-        console.error('Error running task', name, error);
+        console.error("Error running task", name, error);
         return json({ name, success: false });
       }
       return json({ name, success: true });
     }
-    case 'poll': {
-      console.log('Toggling polling for task', name, 'from', task.polling);
+    case "poll": {
+      console.log("Toggling polling for task", name, "from", task.polling);
       if (!task.polling) {
         task.polling = true;
         pollTask(task, 1000 * 60 * 5);
@@ -89,24 +83,14 @@ export default function Tasks() {
                 <strong>Cron schedule:</strong> {cron}
               </p>
               <p>
-                <strong>Polling manually:</strong> {polling ? 'Yes' : 'No'}
+                <strong>Polling manually:</strong> {polling ? "Yes" : "No"}
               </p>
               <input type="hidden" name="name" value={name} />
-              <button
-                type="submit"
-                name="action"
-                value="run"
-                className="outline flex gap middle"
-              >
+              <button type="submit" name="action" value="run" className="outline flex gap middle">
                 <PlayIcon />
                 Run once
               </button>
-              <button
-                type="submit"
-                name="action"
-                value="poll"
-                className="outline flex gap middle"
-              >
+              <button type="submit" name="action" value="poll" className="outline flex gap middle">
                 {polling ? (
                   <>
                     <ClockStopIcon /> Stop polling
@@ -118,12 +102,12 @@ export default function Tasks() {
                 )}
               </button>
             </Form>
-            {navigation.formData?.get('name') === name ? (
+            {navigation.formData?.get("name") === name ? (
               <p>Waiting for server response...</p>
             ) : (
               actionData?.name === name && (
                 <p>
-                  <strong>Success:</strong> {actionData.success ? 'Yes' : 'No'}
+                  <strong>Success:</strong> {actionData.success ? "Yes" : "No"}
                 </p>
               )
             )}

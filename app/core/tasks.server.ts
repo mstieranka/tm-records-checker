@@ -1,19 +1,16 @@
-import { db } from '~/models/database';
-import { maps, players, records } from '~/models/schema';
-import { getConfig } from './config.server';
-import { getTmxMaps } from './tmxApi';
-import { getPlayerNames } from './oauthApi';
-import { getRecords } from './basicApi';
-import { ExtractTablesWithRelations, eq, sql } from 'drizzle-orm';
-import { SQLiteTransaction } from 'drizzle-orm/sqlite-core';
-import { sendRecordsNotification } from './notifier';
-import { sleep } from '~/utils';
+import { db } from "~/models/database";
+import { maps, players, records } from "~/models/schema";
+import { getConfig } from "./config.server";
+import { getTmxMaps } from "./tmxApi";
+import { getPlayerNames } from "./oauthApi";
+import { getRecords } from "./basicApi";
+import { ExtractTablesWithRelations, eq, sql } from "drizzle-orm";
+import { SQLiteTransaction } from "drizzle-orm/sqlite-core";
+import { sendRecordsNotification } from "./notifier";
+import { sleep } from "~/utils";
 
 export async function refetchTmxMaps() {
-  const tmxMaps = await getTmxMaps(
-    getConfig().api.tmx.searchParams,
-    getConfig().api.userAgent
-  );
+  const tmxMaps = await getTmxMaps(getConfig().api.tmx.searchParams, getConfig().api.userAgent);
   await db
     .insert(maps)
     .values(
@@ -25,7 +22,7 @@ export async function refetchTmxMaps() {
         authorTimeMs: map.Medals.Author,
         uploadedAt: map.UploadedAt,
         updatedAt: map.UpdatedAt,
-      }))
+      })),
     )
     .onConflictDoUpdate({
       target: maps.tmxId,
@@ -54,16 +51,14 @@ export type UpdatedRecords = {
 
 export async function refetchRecords() {
   const updatedRecords: UpdatedRecords = {};
-  const mapList = await db
-    .select({ id: maps.ingameId, name: maps.tmxName })
-    .from(maps);
+  const mapList = await db.select({ id: maps.ingameId, name: maps.tmxName }).from(maps);
   const now = new Date().toISOString();
   for await (const map of mapList) {
     try {
       const apiRecords = await getRecords(
         map.id,
         getConfig().api.tmBasic,
-        getConfig().api.userAgent
+        getConfig().api.userAgent,
       );
       await db.transaction(async (tx) => {
         await tx
@@ -74,7 +69,7 @@ export async function refetchRecords() {
               playerId: record.accountId,
               timeMs: record.score,
               timestamp: now,
-            }))
+            })),
           )
           .onConflictDoUpdate({
             target: [records.mapId, records.playerId],
@@ -96,9 +91,7 @@ export async function refetchRecords() {
           })
           .from(records)
           .innerJoin(players, eq(records.playerId, players.id))
-          .where(
-            sql`${records.mapId} = ${map.id} and ${records.timestamp} = ${now}`
-          );
+          .where(sql`${records.mapId} = ${map.id} and ${records.timestamp} = ${now}`);
         if (newRecords.length > 0) {
           updatedRecords[map.name] = newRecords;
         }
@@ -107,9 +100,7 @@ export async function refetchRecords() {
       if (e instanceof Error) {
         console.error(`Failed to refetch records for ${map.id}: ${e.message}`);
       } else if (e instanceof Response) {
-        console.error(
-          `Failed to refetch records for ${map.id}: ${e.statusText}`
-        );
+        console.error(`Failed to refetch records for ${map.id}: ${e.statusText}`);
       }
       continue;
     }
@@ -119,11 +110,11 @@ export async function refetchRecords() {
 
 async function fetchPlayersWithNoName(
   tx?: SQLiteTransaction<
-    'sync',
+    "sync",
     void,
     Record<string, never>,
     ExtractTablesWithRelations<Record<string, never>>
-  >
+  >,
 ) {
   const accountList = await (tx ?? db)
     .select({ id: records.playerId })
@@ -132,7 +123,7 @@ async function fetchPlayersWithNoName(
     .where(sql`${players.name} IS NULL`);
   for await (const playerList of getPlayerNames(
     accountList.flatMap((p) => (p.id === null ? [] : p.id)),
-    getConfig().api.tmOauth
+    getConfig().api.tmOauth,
   )) {
     await (tx ?? db)
       .insert(players)
@@ -152,7 +143,7 @@ export async function refetchPlayers() {
   await db.transaction(async (tx) => {
     for await (const playerList of getPlayerNames(
       accountList.map((p) => p.id),
-      getConfig().api.tmOauth
+      getConfig().api.tmOauth,
     )) {
       await tx
         .insert(players)
@@ -176,21 +167,21 @@ export interface Task {
 
 export const tasks: Task[] = [
   {
-    name: 'RefetchMaps',
+    name: "RefetchMaps",
     task: refetchTmxMaps,
-    cron: '0 23 * * *', // every day at 11pm
+    cron: "0 23 * * *", // every day at 11pm
     polling: false,
   },
   {
-    name: 'RefetchRecords',
+    name: "RefetchRecords",
     task: refetchRecords,
-    cron: '0 6,12,18,0 * * *', // every day every 6 hours
+    cron: "0 6,12,18,0 * * *", // every day every 6 hours
     polling: false,
   },
   {
-    name: 'RefetchPlayers',
+    name: "RefetchPlayers",
     task: refetchPlayers,
-    cron: '0 0 * * 5', // every Friday at midnight
+    cron: "0 0 * * 5", // every Friday at midnight
     polling: false,
   },
 ];
@@ -199,7 +190,7 @@ export async function pollTask(task: Task, pollPeriod: number) {
   while (true) {
     await task.task();
     if (!task.polling) {
-      console.log('Polling end detected for', task.name);
+      console.log("Polling end detected for", task.name);
       break;
     }
     await sleep(pollPeriod);

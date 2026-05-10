@@ -58,9 +58,7 @@
       "indexes": {
         "maps_tmx_id_unique": {
           "name": "maps_tmx_id_unique",
-          "columns": [
-            "tmx_id"
-          ],
+          "columns": ["tmx_id"],
           "isUnique": true
         }
       },
@@ -133,19 +131,12 @@
       "indexes": {
         "records_map_id_player_id_unique": {
           "name": "records_map_id_player_id_unique",
-          "columns": [
-            "map_id",
-            "player_id"
-          ],
+          "columns": ["map_id", "player_id"],
           "isUnique": true
         },
         "records_map_id_player_id_time_ms_unique": {
           "name": "records_map_id_player_id_time_ms_unique",
-          "columns": [
-            "map_id",
-            "player_id",
-            "time_ms"
-          ],
+          "columns": ["map_id", "player_id", "time_ms"],
           "isUnique": true
         }
       },
@@ -153,26 +144,18 @@
         "records_map_id_maps_ingame_id_fk": {
           "name": "records_map_id_maps_ingame_id_fk",
           "tableFrom": "records",
-          "columnsFrom": [
-            "map_id"
-          ],
+          "columnsFrom": ["map_id"],
           "tableTo": "maps",
-          "columnsTo": [
-            "ingame_id"
-          ],
+          "columnsTo": ["ingame_id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         },
         "records_player_id_players_id_fk": {
           "name": "records_player_id_players_id_fk",
           "tableFrom": "records",
-          "columnsFrom": [
-            "player_id"
-          ],
+          "columnsFrom": ["player_id"],
           "tableTo": "players",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }

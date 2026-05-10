@@ -1,23 +1,17 @@
-import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
-import {
-  Form,
-  MetaFunction,
-  useActionData,
-  useLoaderData,
-  useNavigation,
-} from '@remix-run/react';
-import { useState } from 'react';
-import { EyeIcon, EyeOffIcon, ReloadIcon, SaveIcon } from '~/assets/Icons';
-import { getConfig, reloadConfig, saveConfig } from '~/core/config.server';
-import { authenticator } from '~/services/auth.server';
+import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { Form, MetaFunction, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
+import { useState } from "react";
+import { EyeIcon, EyeOffIcon, ReloadIcon, SaveIcon } from "~/assets/Icons";
+import { getConfig, reloadConfig, saveConfig } from "~/core/config.server";
+import { authenticator } from "~/services/auth.server";
 
 export const meta: MetaFunction = () => {
-  return [{ title: 'Settings | TM Records Checker' }];
+  return [{ title: "Settings | TM Records Checker" }];
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await authenticator.isAuthenticated(request, {
-    failureRedirect: '/login',
+    failureRedirect: "/login",
   });
 
   return getConfig();
@@ -25,23 +19,23 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export async function action({ request }: ActionFunctionArgs) {
   await authenticator.isAuthenticated(request, {
-    failureRedirect: '/login',
+    failureRedirect: "/login",
   });
 
   const formData = await request.formData();
-  const action = formData.get('action');
+  const action = formData.get("action");
 
-  console.log('Action:', action);
+  console.log("Action:", action);
 
   switch (action) {
-    case 'reload': {
-      console.log('Reloading config');
+    case "reload": {
+      console.log("Reloading config");
       await reloadConfig();
       return { success: true };
     }
-    case 'save': {
-      const config = JSON.parse(formData.get('config') as string);
-      console.log('Saving config');
+    case "save": {
+      const config = JSON.parse(formData.get("config") as string);
+      console.log("Saving config");
       await saveConfig(config);
       return { success: true };
     }
@@ -58,12 +52,10 @@ export default function Settings() {
 
   return (
     <main className="container">
-      <Form method="post" style={{ margin: '1rem auto' }}>
+      <Form method="post" style={{ margin: "1rem auto" }}>
         <div className="flex-desktop gap middle">
-          <h1 style={{ flexGrow: '1', flexShrink: '1', flexBasis: '0' }}>
-            Settings
-          </h1>
-          <div className="grid flex-grow" style={{ marginBottom: '1rem' }}>
+          <h1 style={{ flexGrow: "1", flexShrink: "1", flexBasis: "0" }}>Settings</h1>
+          <div className="grid flex-grow" style={{ marginBottom: "1rem" }}>
             <button
               className="outline flex gap middle mb-0"
               type="button"
@@ -101,24 +93,24 @@ export default function Settings() {
         </div>
 
         {navigation.formData !== undefined ? (
-          <p style={{ marginBottom: '1rem' }}>Waiting for server response...</p>
+          <p style={{ marginBottom: "1rem" }}>Waiting for server response...</p>
         ) : (
           actionData !== undefined && (
-            <p style={{ marginBottom: '1rem' }}>
-              <strong>Success:</strong> {actionData.success ? 'Yes' : 'No'}
+            <p style={{ marginBottom: "1rem" }}>
+              <strong>Success:</strong> {actionData.success ? "Yes" : "No"}
             </p>
           )
         )}
 
-        <div style={{ marginBottom: '1rem' }}>
+        <div style={{ marginBottom: "1rem" }}>
           <textarea
             id="config"
             name="config"
             defaultValue={JSON.stringify(config, null, 2)}
             style={{
-              fontFamily: 'monospace',
-              height: '70vh',
-              filter: showConfig ? '' : 'blur(0.5rem)',
+              fontFamily: "monospace",
+              height: "70vh",
+              filter: showConfig ? "" : "blur(0.5rem)",
             }}
           />
         </div>

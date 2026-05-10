@@ -3,7 +3,6 @@ export interface BasicAuthData {
   password: string;
 }
 
-
 export interface TmAuthToken {
   accessToken: string;
   accessTokenExpiry?: number;

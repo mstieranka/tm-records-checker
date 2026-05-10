@@ -1,69 +1,60 @@
-import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node';
-import { json } from '@remix-run/node';
-import {
-  Form,
-  Links,
-  LiveReload,
-  Meta,
-  MetaFunction,
-  Outlet,
-  Scripts,
-  useLoaderData,
-} from '@remix-run/react';
-import { User } from './models/auth';
-import { authenticator } from './services/auth.server';
-import { commitSession, getSession } from './services/session.server';
+import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { Form, Links, LiveReload, Meta, Outlet, Scripts, useLoaderData } from "@remix-run/react";
+import { User } from "./models/auth";
+import { authenticator } from "./services/auth.server";
+import { commitSession, getSession } from "./services/session.server";
 
-import appStylesHref from '@picocss/pico/css/pico.min.css';
-import favicon16 from './assets/favicon-16x16.png';
-import favicon192 from './assets/favicon-192x192.png';
-import favicon32 from './assets/favicon-32x32.png';
-import favicon96 from './assets/favicon-96x96.png';
-import faviconIco from './assets/favicon.ico';
-import customStyles from './root.css';
+import appStylesHref from "@picocss/pico/css/pico.min.css";
+import favicon16 from "./assets/favicon-16x16.png";
+import favicon192 from "./assets/favicon-192x192.png";
+import favicon32 from "./assets/favicon-32x32.png";
+import favicon96 from "./assets/favicon-96x96.png";
+import faviconIco from "./assets/favicon.ico";
+import customStyles from "./root.css";
 
 export const links: LinksFunction = () => [
-  { rel: 'stylesheet', href: appStylesHref },
-  { rel: 'stylesheet', href: customStyles },
+  { rel: "stylesheet", href: appStylesHref },
+  { rel: "stylesheet", href: customStyles },
   {
-    rel: 'icon',
-    type: 'image/png',
-    sizes: '16x16',
+    rel: "icon",
+    type: "image/png",
+    sizes: "16x16",
     href: favicon16,
   },
   {
-    rel: 'icon',
-    type: 'image/png',
-    sizes: '32x32',
+    rel: "icon",
+    type: "image/png",
+    sizes: "32x32",
     href: favicon32,
   },
   {
-    rel: 'icon',
-    type: 'image/png',
-    sizes: '96x96',
+    rel: "icon",
+    type: "image/png",
+    sizes: "96x96",
     href: favicon96,
   },
   {
-    rel: 'icon',
-    type: 'image/png',
-    sizes: '192x192',
+    rel: "icon",
+    type: "image/png",
+    sizes: "192x192",
     href: favicon192,
   },
-  { rel: 'shortcut icon', type: 'image/x-icon', href: faviconIco },
-  { rel: 'icon', type: 'image/x-icon', href: faviconIco },
+  { rel: "shortcut icon", type: "image/x-icon", href: faviconIco },
+  { rel: "icon", type: "image/x-icon", href: faviconIco },
 ];
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  let session = await getSession(request.headers.get('cookie'));
+  let session = await getSession(request.headers.get("cookie"));
   let error = session.get(authenticator.sessionErrorKey);
   if (error) {
     return json(
       { error },
       {
         headers: {
-          'Set-Cookie': await commitSession(session), // You must commit the session whenever you read a flash
+          "Set-Cookie": await commitSession(session), // You must commit the session whenever you read a flash
         },
-      }
+      },
     );
   }
 
@@ -159,7 +150,7 @@ export default function Root() {
                   border: 0,
                   padding: 0,
                   margin: 0,
-                  fontSize: '0.75rem',
+                  fontSize: "0.75rem",
                 }}
               >
                 Logout

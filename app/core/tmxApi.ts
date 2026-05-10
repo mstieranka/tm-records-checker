@@ -6,7 +6,7 @@ export interface TmxApiConfig {
   searchParams: TmxSearchParams;
 }
 
-export interface TmxMap extends Object {
+export interface TmxMap {
   /** TMX map ID */
   MapId: number;
 
@@ -31,37 +31,24 @@ export interface TmxMap extends Object {
   UpdatedAt: string;
 }
 
-const TMX_BASE_URL = 'https://trackmania.exchange/api';
+const TMX_BASE_URL = "https://trackmania.exchange/api";
 function getTmxSearchUrl(authorId: number) {
   return `${TMX_BASE_URL}/maps?fields=${encodeURIComponent(
-    [
-      'MapId',
-      'Name',
-      'MapUid',
-      'GbxMapName',
-      'Medals.Author',
-      'UploadedAt',
-      'UpdatedAt',
-    ].join(',')
+    ["MapId", "Name", "MapUid", "GbxMapName", "Medals.Author", "UploadedAt", "UpdatedAt"].join(","),
   )}&authoruserid=${authorId}`;
 }
 
-export async function getTmxMaps(
-  searchParams: TmxSearchParams,
-  userAgent: string
-) {
+export async function getTmxMaps(searchParams: TmxSearchParams, userAgent: string) {
   const url = getTmxSearchUrl(searchParams.userId);
-  console.log('Retrieving map list', url);
+  console.log("Retrieving map list", url);
   const mapListResponse = await fetch(url, {
     headers: {
-      'Content-Type': 'application/json',
-      'User-Agent': userAgent,
+      "Content-Type": "application/json",
+      "User-Agent": userAgent,
     },
   });
   if (!mapListResponse.ok) {
-    throw new Error(
-      `Failed to retrieve map list: ${mapListResponse.statusText}`
-    );
+    throw new Error(`Failed to retrieve map list: ${mapListResponse.statusText}`);
   }
   let pageData = (await mapListResponse.json()) as {
     Results: TmxMap[];
@@ -73,14 +60,12 @@ export async function getTmxMaps(
     const lastMapId = pageData.Results[pageData.Results.length - 1].MapId;
     const nextPageResponse = await fetch(`${url}&after=${lastMapId}`, {
       headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': userAgent,
+        "Content-Type": "application/json",
+        "User-Agent": userAgent,
       },
     });
     if (!nextPageResponse.ok) {
-      throw new Error(
-        `Failed to retrieve map list: ${nextPageResponse.statusText}`
-      );
+      throw new Error(`Failed to retrieve map list: ${nextPageResponse.statusText}`);
     }
     pageData = (await nextPageResponse.json()) as {
       Results: TmxMap[];

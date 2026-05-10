@@ -1,6 +1,6 @@
-import { desc, eq, sql } from 'drizzle-orm';
-import { db } from '~/models/database';
-import { maps, players, records } from '~/models/schema';
+import { desc, eq, sql } from "drizzle-orm";
+import { db } from "~/models/database";
+import { maps, players, records } from "~/models/schema";
 
 export const getMaps = async () => {
   return await db
@@ -23,11 +23,7 @@ export const getMaps = async () => {
 };
 
 export const getMapInfo = async (ingameId: string) => {
-  const map = await db
-    .select()
-    .from(maps)
-    .where(eq(maps.ingameId, ingameId))
-    .limit(1);
+  const map = await db.select().from(maps).where(eq(maps.ingameId, ingameId)).limit(1);
 
   if (map.length === 0) {
     return null;

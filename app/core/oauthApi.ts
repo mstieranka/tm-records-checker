@@ -1,4 +1,4 @@
-import { isTimeClose } from '~/utils';
+import { isTimeClose } from "~/utils";
 
 export interface OauthData {
   clientId: string;
@@ -10,10 +10,7 @@ interface TMOAuthToken {
   expiresAt: number;
 }
 
-export async function* getPlayerNames(
-  accountIds: string[],
-  oauthData: OauthData
-) {
+export async function* getPlayerNames(accountIds: string[], oauthData: OauthData) {
   // split into chunks of 50 due to API limitations
   const chunks = [];
   for (let i = 0; i < accountIds.length; i += 50) {
@@ -28,19 +25,16 @@ let currentAuth: TMOAuthToken | undefined;
 
 async function refreshAuth(oauthData: OauthData) {
   if (!currentAuth || isTimeClose(currentAuth.expiresAt)) {
-    const response = await fetch(
-      'https://api.trackmania.com/api/access_token',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `grant_type=client_credentials&client_id=${oauthData.clientId}&client_secret=${oauthData.clientSecret}`,
-      }
-    );
+    const response = await fetch("https://api.trackmania.com/api/access_token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: `grant_type=client_credentials&client_id=${oauthData.clientId}&client_secret=${oauthData.clientSecret}`,
+    });
 
     if (!response.ok) {
-      throw new Error('Failed to refresh OAuth token: ' + response.statusText);
+      throw new Error("Failed to refresh OAuth token: " + response.statusText);
     }
 
     const auth = (await response.json()) as {
@@ -49,7 +43,7 @@ async function refreshAuth(oauthData: OauthData) {
     };
 
     if (!auth.access_token) {
-      throw new Error('Failed to refresh OAuth token');
+      throw new Error("Failed to refresh OAuth token");
     }
 
     currentAuth = {
@@ -63,17 +57,16 @@ async function getDisplayNames(accountIds: string[], oauthData: OauthData) {
   await refreshAuth(oauthData);
 
   const response = await fetch(
-    'https://api.trackmania.com/api/display-names?accountId[]=' +
-      accountIds.join('&accountId[]='),
+    "https://api.trackmania.com/api/display-names?accountId[]=" + accountIds.join("&accountId[]="),
     {
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + currentAuth?.accessToken,
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + currentAuth?.accessToken,
       },
-    }
+    },
   );
   if (!response.ok) {
-    throw new Error('Failed to retrieve display names: ' + response.statusText);
+    throw new Error("Failed to retrieve display names: " + response.statusText);
   }
 
   const map = (await response.json()) as Record<string, string>;
