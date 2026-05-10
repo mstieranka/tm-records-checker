@@ -1,5 +1,5 @@
-import { LoaderFunctionArgs, json } from "@remix-run/node";
-import { MetaFunction, useLoaderData } from "@remix-run/react";
+import { LoaderFunctionArgs, data } from "@remix-run/node";
+import { isRouteErrorResponse, MetaFunction, useLoaderData, useRouteError } from "@remix-run/react";
 import { getMapInfo } from "~/models/maps.server";
 import { authenticator } from "~/services/auth.server";
 import { formatTime, formatTimestamp } from "~/utils";
@@ -21,20 +21,21 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   });
 
   if (!params.ingameId) {
-    return json({ error: "Invalid map ID" }, { status: 400 });
+    throw data({ error: "Missing map ID" }, { status: 400 });
   }
 
-  return json({ mapInfo: await getMapInfo(params.ingameId) });
+  return { mapInfo: await getMapInfo(params.ingameId) };
 }
 
 export default function MapRecords() {
   const data = useLoaderData<typeof loader>();
-  if ("error" in data) {
-    return <h1>{data.error}</h1>;
-  }
   const map = data.mapInfo;
   if (!map) {
-    return <h1>Map not found</h1>;
+    return (
+      <main className="container">
+        <h1>Map not found</h1>
+      </main>
+    );
   }
   return (
     <main className="container">
@@ -109,4 +110,24 @@ export default function MapRecords() {
       </div>
     </main>
   );
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+  if (isRouteErrorResponse(error)) {
+    return (
+      <main className="container">
+        <h1>{error.data.error}</h1>
+        <p>Error {error.status}</p>
+      </main>
+    );
+  } else if (error instanceof Error) {
+    return (
+      <main className="container">
+        <h1>Error</h1>
+        <p>{error.message}</p>
+      </main>
+    );
+  }
+  return <h1>Unknown Error</h1>;
 }

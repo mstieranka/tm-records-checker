@@ -9,7 +9,7 @@ Planned refactors in order of execution:
   - [x] Enable `v3_singleFetch` future flag (data fetching changes to single fetch)
   - [x] Enable `v3_throwAbortReason` future flag (format of errors thrown on aborted requests change)
   - [x] Enable `v3_routeConfig` future flag (explicit `app/routes.ts` config aligned with React Router v7)
-  - [ ] Replace deprecations - `json`, `defer`, `SerializeFrom`
+  - [x] Replace deprecations - `json`, `defer`, `SerializeFrom`
   - [ ] Upgrade packages from Remix to React Router v7
 - [ ] 2. Rewrite UI using `@shadcn/ui`
 - [ ] 3. Migrate database from SQLite to PostgreSQL

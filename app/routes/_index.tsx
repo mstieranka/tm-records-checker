@@ -1,4 +1,4 @@
-import { LoaderFunctionArgs, json } from "@remix-run/node";
+import { LoaderFunctionArgs } from "@remix-run/node";
 import { MetaFunction, useLoaderData } from "@remix-run/react";
 import { getLatestRecords } from "~/models/records.server";
 import { authenticator } from "~/services/auth.server";
@@ -13,7 +13,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     failureRedirect: "/login",
   });
 
-  return json({ records: await getLatestRecords() });
+  return { records: await getLatestRecords() };
 }
 
 export default function Index() {

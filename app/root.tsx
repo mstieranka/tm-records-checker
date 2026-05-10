@@ -1,5 +1,5 @@
 import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import { data } from "@remix-run/node";
 import { Form, Links, Meta, Outlet, Scripts, useLoaderData } from "@remix-run/react";
 import { User } from "./models/auth";
 import { authenticator } from "./services/auth.server";
@@ -48,7 +48,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   let session = await getSession(request.headers.get("cookie"));
   let error = session.get(authenticator.sessionErrorKey);
   if (error) {
-    return json(
+    return data(
       { error },
       {
         headers: {
@@ -58,9 +58,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
     );
   }
 
-  return json({
+  return {
     auth: await authenticator.isAuthenticated(request),
-  });
+  };
 }
 
 function NavLinks() {
