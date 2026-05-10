@@ -39,8 +39,8 @@ const validateConfig = (config: Partial<Config>) => {
   if (!config.api.tmBasic) {
     throw new Error('tmBasic config missing');
   }
-  if (!config.api.tmBasic.email) {
-    throw new Error('tmBasic email missing');
+  if (!config.api.tmBasic.username) {
+    throw new Error('tmBasic username missing');
   }
   if (!config.api.tmBasic.password) {
     throw new Error('tmBasic password missing');

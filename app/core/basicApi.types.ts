@@ -1,25 +1,8 @@
 export interface BasicAuthData {
-  email: string;
+  username: string;
   password: string;
 }
 
-export interface TmSessionResponse {
-  platformType: 'uplay';
-  ticket: string;
-  twoFactorAuthenticationTicket: string;
-  profileId: string;
-  userId: string;
-  nameOnPlatform: string;
-  environment: string;
-  expiration: string;
-  spaceId: string;
-  clientIp: string;
-  clientIpCountry: string;
-  serverTime: string;
-  sessionId: string;
-  sessionKey: string;
-  rememberMeTicket: string;
-}
 
 export interface TmAuthToken {
   accessToken: string;

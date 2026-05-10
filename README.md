@@ -21,7 +21,7 @@ Inside this `data/` folder, create a `config.json` file. It looks something like
       }
     },
     "tmBasic": {
-      "email": "user@example.com",
+      "username": "service_someservicename",
       "password": "hunter2"
     },
     "tmOauth": {
@@ -49,7 +49,7 @@ Config options:
 * `baseUrl` *[required]* - the URL for the application, this is used in push notifications and the login process
 * `api` *[required]* - parameters for the APIs that are used to access the relevant data
   *  `tmx` *[required]* - contains information related to Trackmania Exchange, specifically the ID of the user whose maps are to be checked
-  *  `tmBasic` *[required]* - contains your Ubisoft login information (used to access map records)
+  *  `tmBasic` *[required]* - contains your service account information (used to access map records)
   *  `tmOAuth` *[required]* - requires a special client ID and secret; it's needed in order to show display names (e.g. `playerTM` instead of `bf64ca65-f1da-4662-b827-e84fb59b821f`), because Nadeo removed the endpoint from their public API (wtf?). You can learn more about how to get the ID and secret [here](https://webservices.openplanet.dev/oauth/auth#machine-to-machine-flow).
 * `githubAuth` *[required]* - this app uses the GitHub OAuth API for logging in, so you'll need a GitHub account and [an OAuth app](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app) (use `{baseUrl}/auth/callback` as the callback URL)
   * `clientId`, `clientConfig` *[required]* - client ID and secret for the OAuth app
