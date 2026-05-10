@@ -10,9 +10,9 @@ export let authenticator = new Authenticator<User>(sessionStorage);
 
 let gitHubStrategy = new GitHubStrategy<User>(
   {
-    clientID: getConfig().githubAuth.clientId,
+    clientId: getConfig().githubAuth.clientId,
     clientSecret: getConfig().githubAuth.clientSecret,
-    callbackURL:
+    redirectURI:
       process.env.NODE_ENV === "development"
         ? "http://127.0.0.1:3000/auth/callback"
         : `${getConfig().baseUrl}/auth/callback`,
