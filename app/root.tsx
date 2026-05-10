@@ -116,7 +116,7 @@ export default function Root() {
                 <>
                   <div className="hidden md:block">
                     <NavigationMenu>
-                      <NavigationMenuList>
+                      <NavigationMenuList className="space-x-2">
                         {NAV_LINKS.map((link) => (
                           <NavigationMenuItem key={link.to}>
                             <NavigationMenuLink
