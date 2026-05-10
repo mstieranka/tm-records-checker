@@ -11,8 +11,6 @@ for (const task of tasks) {
     {
       timezone: "Europe/Prague",
       name: task.name,
-      scheduled: true,
-      runOnInit: false,
     },
   );
 }

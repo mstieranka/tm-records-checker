@@ -6,7 +6,6 @@
     "paths": {
       "~/*": ["./app/*"]
     },
-    "baseUrl": ".",
     // enable latest features
     "lib": ["esnext"],
     "module": "esnext",
