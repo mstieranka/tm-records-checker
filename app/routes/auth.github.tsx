@@ -1,11 +1,8 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
-import { authenticator } from "~/services/auth.server";
+import type { LoaderFunctionArgs } from "react-router";
+import { authenticateOAuth } from "~/auth/authenticator.server";
 
-export async function loader() {
-  return redirect("/login");
+export async function loader({ request }: LoaderFunctionArgs) {
+  return authenticateOAuth(request, "github");
 }
 
-export async function action({ request }: LoaderFunctionArgs) {
-  return authenticator.authenticate("github", request);
-}
+export const action = loader;

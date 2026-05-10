@@ -10,7 +10,8 @@ Planned refactors in order of execution:
   - [x] Enable `v3_throwAbortReason` future flag (format of errors thrown on aborted requests change)
   - [x] Enable `v3_routeConfig` future flag (explicit `app/routes.ts` config aligned with React Router v7)
   - [x] Replace deprecations - `json`, `defer`, `SerializeFrom`
-  - [ ] Upgrade packages from Remix to React Router v7
+  - [x] Upgrade packages from Remix to React Router v7
+  - [ ] Migrate route loaders/actions/meta to generated `Route.LoaderArgs` / `Route.ActionArgs` / `Route.MetaArgs` types from `.react-router/types/.../+types/<route>.ts` (gives typed `params` and typed `loaderData` in `meta`)
 - [ ] 2. Rewrite UI using `@shadcn/ui`
 - [ ] 3. Migrate database from SQLite to PostgreSQL
 - [ ] 4. Move configuration from `config.json` into the database; add initial setup UI (depends on steps 2 and 3)

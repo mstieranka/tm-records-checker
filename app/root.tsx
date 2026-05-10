@@ -1,9 +1,8 @@
-import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
-import { data } from "@remix-run/node";
-import { Form, Links, Meta, Outlet, Scripts, useLoaderData } from "@remix-run/react";
-import { User } from "./models/auth";
-import { authenticator } from "./services/auth.server";
-import { commitSession, getSession } from "./services/session.server";
+import type { LinksFunction, LoaderFunctionArgs } from "react-router";
+import { data } from "react-router";
+import { Form, Links, Meta, Outlet, Scripts, useLoaderData } from "react-router";
+import { User } from "./auth/types";
+import { AUTH_ERROR_KEY, commitSession, getSession, getUser } from "./auth/session.server";
 
 import appStylesHref from "@picocss/pico/css/pico.min.css?url";
 import favicon16 from "./assets/favicon-16x16.png";
@@ -46,7 +45,7 @@ export const links: LinksFunction = () => [
 
 export async function loader({ request }: LoaderFunctionArgs) {
   let session = await getSession(request.headers.get("cookie"));
-  let error = session.get(authenticator.sessionErrorKey);
+  let error = session.get(AUTH_ERROR_KEY);
   if (error) {
     return data(
       { error },
@@ -59,7 +58,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 
   return {
-    auth: await authenticator.isAuthenticated(request),
+    auth: await getUser(request),
   };
 }
 

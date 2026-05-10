@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
-  "ignorePatterns": [],
+  "ignorePatterns": [".react-router/**/*"],
   "tabWidth": 2,
   "useTabs": false
 }

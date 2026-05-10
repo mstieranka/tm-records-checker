@@ -1,7 +1,7 @@
-import { LoaderFunctionArgs, data } from "@remix-run/node";
-import { isRouteErrorResponse, MetaFunction, useLoaderData, useRouteError } from "@remix-run/react";
+import { LoaderFunctionArgs, data } from "react-router";
+import { isRouteErrorResponse, MetaFunction, useLoaderData, useRouteError } from "react-router";
 import { getMapInfo } from "~/models/maps.server";
-import { authenticator } from "~/services/auth.server";
+import { requireUser } from "~/auth/session.server";
 import { formatTime, formatTimestamp } from "~/utils";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
@@ -16,9 +16,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 };
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  await authenticator.isAuthenticated(request, {
-    failureRedirect: "/login",
-  });
+  await requireUser(request);
 
   if (!params.ingameId) {
     throw data({ error: "Missing map ID" }, { status: 400 });

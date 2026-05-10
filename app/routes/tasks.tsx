@@ -1,7 +1,7 @@
-import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { pollTask, tasks } from "../core/tasks.server";
-import { Form, MetaFunction, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
-import { authenticator } from "~/services/auth.server";
+import { Form, MetaFunction, useActionData, useLoaderData, useNavigation } from "react-router";
+import { requireUser } from "~/auth/session.server";
 import { ClockPlayIcon, ClockStopIcon, PlayIcon } from "~/assets/Icons";
 
 export const meta: MetaFunction = () => {
@@ -9,9 +9,7 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  await authenticator.isAuthenticated(request, {
-    failureRedirect: "/login",
-  });
+  await requireUser(request);
 
   return {
     tasks: tasks.map(({ name, cron, polling }) => ({ name, cron, polling })),
@@ -19,9 +17,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  await authenticator.isAuthenticated(request, {
-    failureRedirect: "/login",
-  });
+  await requireUser(request);
 
   const formData = await request.formData();
   const action = formData.get("action");

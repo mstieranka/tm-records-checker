@@ -1,7 +1,6 @@
-import { data, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, MetaFunction, useLoaderData } from "@remix-run/react";
-import { authenticator } from "~/services/auth.server";
-import { commitSession, getSession } from "~/services/session.server";
+import { data, LoaderFunctionArgs, redirect } from "react-router";
+import { Form, MetaFunction, useLoaderData } from "react-router";
+import { AUTH_ERROR_KEY, commitSession, getSession, getUser } from "~/auth/session.server";
 
 export const meta: MetaFunction = () => {
   return [{ title: "Login | TM Records Checker" }];
@@ -24,8 +23,12 @@ export default function Screen() {
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  if (await getUser(request)) {
+    throw redirect("/");
+  }
+
   let session = await getSession(request.headers.get("cookie"));
-  let error = session.get(authenticator.sessionErrorKey);
+  let error = session.get(AUTH_ERROR_KEY);
   if (error) {
     return data(
       { error },
@@ -37,7 +40,5 @@ export async function loader({ request }: LoaderFunctionArgs) {
     );
   }
 
-  return await authenticator.isAuthenticated(request, {
-    successRedirect: "/",
-  });
+  return null;
 }

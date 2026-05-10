@@ -1,7 +1,7 @@
 {
   "include": ["**/*.ts", "**/*.tsx"],
   "compilerOptions": {
-    "types": ["bun-types", "@remix-run/node", "vite/client"],
+    "types": ["bun-types", "@react-router/node", "vite/client"],
     "paths": {
       "~/*": ["./app/*"]
     },
