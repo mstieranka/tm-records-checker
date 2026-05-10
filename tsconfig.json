@@ -1,24 +1,13 @@
 {
-  "include": [
-    "**/*.ts",
-    "**/*.tsx"
-  ],
+  "include": ["**/*.ts", "**/*.tsx"],
   "compilerOptions": {
-    "types": [
-      "bun-types",
-      "@remix-run/node",
-      "vite/client"
-    ],
+    "types": ["bun-types", "@remix-run/node", "vite/client"],
     "paths": {
-      "~/*": [
-        "./app/*"
-      ]
+      "~/*": ["./app/*"]
     },
     "baseUrl": ".",
     // enable latest features
-    "lib": [
-      "esnext"
-    ],
+    "lib": ["esnext"],
     "module": "esnext",
     "target": "esnext",
     // if TS 5.x+

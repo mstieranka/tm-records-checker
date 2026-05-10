@@ -15,7 +15,8 @@
     "lint": "oxlint",
     "start": "bunx --bun cross-env NODE_ENV=production remix-serve ./build/server/index.js",
     "start:cron": "cross-env NODE_ENV=production bun cron.ts",
-    "start:prod": "bun db:migrate && concurrently \"bun run start\" \"bun run start:cron\""
+    "start:prod": "bun db:migrate && concurrently \"bun run start\" \"bun run start:cron\"",
+    "validate": "bun fmt:check && bun lint && bun tsc"
   },
   "dependencies": {
     "@picocss/pico": "2.1.1",
