@@ -1,14 +1,14 @@
-import { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { pollTask, tasks } from "../core/tasks.server";
-import { Form, MetaFunction, useActionData, useLoaderData, useNavigation } from "react-router";
+import { Form, useActionData, useLoaderData, useNavigation } from "react-router";
+import type { Route } from "./+types/tasks";
 import { requireUser } from "~/auth/session.server";
 import { ClockPlayIcon, ClockStopIcon, PlayIcon } from "~/assets/Icons";
 
-export const meta: MetaFunction = () => {
+export const meta: Route.MetaFunction = () => {
   return [{ title: "Tasks | TM Records Checker" }];
 };
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   await requireUser(request);
 
   return {
@@ -16,7 +16,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   };
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
   await requireUser(request);
 
   const formData = await request.formData();

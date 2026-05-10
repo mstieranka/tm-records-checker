@@ -1,13 +1,14 @@
-import { data, LoaderFunctionArgs, redirect } from "react-router";
-import { Form, MetaFunction, useLoaderData } from "react-router";
+import { data, redirect } from "react-router";
+import { Form, useLoaderData } from "react-router";
+import type { Route } from "./+types/login";
 import { AUTH_ERROR_KEY, commitSession, getSession, getUser } from "~/auth/session.server";
 
-export const meta: MetaFunction = () => {
+export const meta: Route.MetaFunction = () => {
   return [{ title: "Login | TM Records Checker" }];
 };
 
 export default function Screen() {
-  const loaderData = useLoaderData<{ error: any } | undefined>();
+  const loaderData = useLoaderData<typeof loader>();
 
   return (
     <main className="container-fluid">
@@ -22,7 +23,7 @@ export default function Screen() {
   );
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   if (await getUser(request)) {
     throw redirect("/");
   }

@@ -1,7 +1,6 @@
-import type { LinksFunction, LoaderFunctionArgs } from "react-router";
 import { data } from "react-router";
 import { Form, Links, Meta, Outlet, Scripts, useLoaderData } from "react-router";
-import { User } from "./auth/types";
+import type { Route } from "./+types/root";
 import { AUTH_ERROR_KEY, commitSession, getSession, getUser } from "./auth/session.server";
 
 import appStylesHref from "@picocss/pico/css/pico.min.css?url";
@@ -12,7 +11,7 @@ import favicon96 from "./assets/favicon-96x96.png";
 import faviconIco from "./assets/favicon.ico";
 import customStyles from "./root.css?url";
 
-export const links: LinksFunction = () => [
+export const links: Route.LinksFunction = () => [
   { rel: "stylesheet", href: appStylesHref },
   { rel: "stylesheet", href: customStyles },
   {
@@ -43,7 +42,7 @@ export const links: LinksFunction = () => [
   { rel: "icon", type: "image/x-icon", href: faviconIco },
 ];
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   let session = await getSession(request.headers.get("cookie"));
   let error = session.get(AUTH_ERROR_KEY);
   if (error) {
@@ -85,7 +84,7 @@ function NavLinks() {
 }
 
 export default function Root() {
-  const data = useLoaderData<{ auth?: User; error?: any }>();
+  const data = useLoaderData<typeof loader>();
 
   return (
     <html>
@@ -103,7 +102,7 @@ export default function Root() {
               <a href="/">TM Records Checker</a>
             </li>
           </ul>
-          {!!data.auth && (
+          {"auth" in data && !!data.auth && (
             <>
               <ul className="mobile-only">
                 <li>
@@ -139,7 +138,7 @@ export default function Root() {
           )}
         </nav>
         <Outlet />
-        {!!data.error && (
+        {"error" in data && !!data.error && (
           <footer className="container-fluid">
             <hr />
             <Form action="/auth/logout" method="post">

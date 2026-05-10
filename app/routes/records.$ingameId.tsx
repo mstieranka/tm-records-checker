@@ -1,27 +1,22 @@
-import { LoaderFunctionArgs, data } from "react-router";
-import { isRouteErrorResponse, MetaFunction, useLoaderData, useRouteError } from "react-router";
+import { isRouteErrorResponse, useLoaderData, useRouteError } from "react-router";
+import type { Route } from "./+types/records.$ingameId";
 import { getMapInfo } from "~/models/maps.server";
 import { requireUser } from "~/auth/session.server";
 import { formatTime, formatTimestamp } from "~/utils";
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  if (!data || "error" in data) {
+export const meta: Route.MetaFunction = ({ loaderData }) => {
+  if (!loaderData || "error" in loaderData) {
     return [{ title: "Error | TM Records Checker" }];
   }
   return [
     {
-      title: `${data.mapInfo?.tmxName ?? data.mapInfo?.ingameName} | TM Records Checker`,
+      title: `${loaderData.mapInfo?.tmxName ?? loaderData.mapInfo?.ingameName} | TM Records Checker`,
     },
   ];
 };
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
   await requireUser(request);
-
-  if (!params.ingameId) {
-    throw data({ error: "Missing map ID" }, { status: 400 });
-  }
-
   return { mapInfo: await getMapInfo(params.ingameId) };
 }
 

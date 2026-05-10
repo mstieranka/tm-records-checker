@@ -1,14 +1,14 @@
-import { LoaderFunctionArgs } from "react-router";
-import { MetaFunction, useLoaderData } from "react-router";
+import { useLoaderData } from "react-router";
+import type { Route } from "./+types/_index";
 import { getLatestRecords } from "~/models/records.server";
 import { requireUser } from "~/auth/session.server";
 import { formatTime, formatTimestamp } from "~/utils";
 
-export const meta: MetaFunction = () => {
+export const meta: Route.MetaFunction = () => {
   return [{ title: "Home | TM Records Checker" }];
 };
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   await requireUser(request);
 
   return { records: await getLatestRecords() };

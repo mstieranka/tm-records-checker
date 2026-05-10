@@ -1,7 +1,8 @@
 {
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": [".react-router/types/**/*", "**/*.ts", "**/*.tsx"],
   "compilerOptions": {
     "types": ["bun-types", "@react-router/node", "vite/client"],
+    "rootDirs": [".", "./.react-router/types"],
     "paths": {
       "~/*": ["./app/*"]
     },

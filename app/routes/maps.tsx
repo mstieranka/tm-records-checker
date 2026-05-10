@@ -1,15 +1,15 @@
-import { MetaFunction, useLoaderData } from "react-router";
-import { LoaderFunctionArgs } from "react-router";
+import { useLoaderData } from "react-router";
+import type { Route } from "./+types/maps";
 import { getMaps } from "~/models/maps.server";
 import { useState } from "react";
 import { requireUser } from "~/auth/session.server";
 import { formatTime } from "~/utils";
 
-export const meta: MetaFunction = () => {
+export const meta: Route.MetaFunction = () => {
   return [{ title: "Maps | TM Records Checker" }];
 };
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   await requireUser(request);
 
   return { mapList: await getMaps() };

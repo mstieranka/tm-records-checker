@@ -1,21 +1,21 @@
-import { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
-import { Form, MetaFunction, useActionData, useLoaderData, useNavigation } from "react-router";
+import { Form, useActionData, useLoaderData, useNavigation } from "react-router";
+import type { Route } from "./+types/settings";
 import { useState } from "react";
 import { EyeIcon, EyeOffIcon, ReloadIcon, SaveIcon } from "~/assets/Icons";
 import { getConfig, reloadConfig, saveConfig } from "~/core/config.server";
 import { requireUser } from "~/auth/session.server";
 
-export const meta: MetaFunction = () => {
+export const meta: Route.MetaFunction = () => {
   return [{ title: "Settings | TM Records Checker" }];
 };
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   await requireUser(request);
 
   return getConfig();
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
   await requireUser(request);
 
   const formData = await request.formData();
