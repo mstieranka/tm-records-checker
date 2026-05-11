@@ -4,3 +4,4 @@ build/
 .cache/
 data/
 .react-router/
+.env

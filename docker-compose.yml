@@ -1,12 +1,28 @@
-version: "3.9"
 services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: tmrecords
+      POSTGRES_USER: tmrecords
+      POSTGRES_PASSWORD: tmrecords
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
   checker:
     build: .
     ports:
       - "3020:3000"
     environment:
       - NODE_ENV=production
+      - DATABASE_URL=postgres://tmrecords:tmrecords@postgres:5432/tmrecords
     volumes:
       - type: bind
         source: ./data/
         target: /app/data/
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

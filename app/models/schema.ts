@@ -1,13 +1,13 @@
-import { int, text, sqliteTable, unique } from "drizzle-orm/sqlite-core";
+import { integer, text, pgTable, unique } from "drizzle-orm/pg-core";
 
-export const maps = sqliteTable(
+export const maps = pgTable(
   "maps",
   {
     ingameId: text("ingame_id").notNull().primaryKey(),
     ingameName: text("ingame_name").notNull(),
-    tmxId: int("tmx_id").notNull(),
+    tmxId: integer("tmx_id").notNull(),
     tmxName: text("tmx_name").notNull(),
-    authorTimeMs: int("author_time_ms").notNull(),
+    authorTimeMs: integer("author_time_ms").notNull(),
     uploadedAt: text("uploaded_at").notNull(),
     updatedAt: text("updated_at").notNull(),
   },
@@ -16,17 +16,17 @@ export const maps = sqliteTable(
   }),
 );
 
-export const records = sqliteTable(
+export const records = pgTable(
   "records",
   {
-    id: int("id").notNull().primaryKey({ autoIncrement: true }),
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
     mapId: text("map_id")
       .notNull()
       .references(() => maps.ingameId),
     playerId: text("player_id")
       .references(() => players.id)
       .notNull(),
-    timeMs: int("time_ms").notNull(),
+    timeMs: integer("time_ms").notNull(),
     timestamp: text("timestamp").notNull(),
   },
   (t) => ({
@@ -35,7 +35,7 @@ export const records = sqliteTable(
   }),
 );
 
-export const players = sqliteTable("players", {
+export const players = pgTable("players", {
   id: text("id").notNull().primaryKey(),
   name: text("name").notNull(),
 });

@@ -4,8 +4,9 @@ import { getConfig } from "./config.server";
 import { getTmxMaps } from "./tmxApi";
 import { getPlayerNames } from "./oauthApi";
 import { getRecords } from "./basicApi";
-import { ExtractTablesWithRelations, eq, sql } from "drizzle-orm";
-import { SQLiteTransaction } from "drizzle-orm/sqlite-core";
+import { eq, sql } from "drizzle-orm";
+import type { PgDatabase } from "drizzle-orm/pg-core";
+import type { PostgresJsQueryResultHKT } from "drizzle-orm/postgres-js";
 import { sendRecordsNotification } from "./notifier";
 import { sleep } from "~/utils";
 
@@ -108,14 +109,7 @@ export async function refetchRecords() {
   sendRecordsNotification(updatedRecords, getConfig().notifications);
 }
 
-async function fetchPlayersWithNoName(
-  tx?: SQLiteTransaction<
-    "sync",
-    void,
-    Record<string, never>,
-    ExtractTablesWithRelations<Record<string, never>>
-  >,
-) {
+async function fetchPlayersWithNoName(tx?: PgDatabase<PostgresJsQueryResultHKT>) {
   const accountList = await (tx ?? db)
     .select({ id: records.playerId })
     .from(records)

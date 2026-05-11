@@ -1,7 +1,7 @@
 import type { Config } from "drizzle-kit";
 
 export default {
-  dialect: "sqlite",
+  dialect: "postgresql",
   schema: "./app/models/schema.ts",
   out: "./drizzle",
 } satisfies Config;

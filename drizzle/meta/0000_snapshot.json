@@ -1,174 +1,189 @@
 {
-  "version": "6",
-  "dialect": "sqlite",
+  "id": "74793922-e303-494c-81b5-e1d3d5677dba",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
   "tables": {
-    "maps": {
+    "public.maps": {
       "name": "maps",
+      "schema": "",
       "columns": {
         "ingame_id": {
           "name": "ingame_id",
           "type": "text",
           "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "ingame_name": {
           "name": "ingame_name",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "tmx_id": {
           "name": "tmx_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "tmx_name": {
           "name": "tmx_name",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "author_time_ms": {
           "name": "author_time_ms",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "uploaded_at": {
           "name": "uploaded_at",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "updated_at": {
           "name": "updated_at",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {
-        "maps_tmx_id_unique": {
-          "name": "maps_tmx_id_unique",
-          "columns": ["tmx_id"],
-          "isUnique": true
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "players": {
-      "name": "players",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {
+        "maps_tmx_id_unique": {
+          "name": "maps_tmx_id_unique",
+          "nullsNotDistinct": false,
+          "columns": ["tmx_id"]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
     },
-    "records": {
+    "public.players": {
+      "name": "players",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.records": {
       "name": "records",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
           "type": "integer",
           "primaryKey": true,
           "notNull": true,
-          "autoincrement": true
+          "identity": {
+            "type": "always",
+            "name": "records_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
         },
         "map_id": {
           "name": "map_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "player_id": {
           "name": "player_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "time_ms": {
           "name": "time_ms",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "timestamp": {
           "name": "timestamp",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         }
       },
-      "indexes": {
-        "records_map_id_player_id_unique": {
-          "name": "records_map_id_player_id_unique",
-          "columns": ["map_id", "player_id"],
-          "isUnique": true
-        },
-        "records_map_id_player_id_time_ms_unique": {
-          "name": "records_map_id_player_id_time_ms_unique",
-          "columns": ["map_id", "player_id", "time_ms"],
-          "isUnique": true
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
         "records_map_id_maps_ingame_id_fk": {
           "name": "records_map_id_maps_ingame_id_fk",
           "tableFrom": "records",
-          "columnsFrom": ["map_id"],
           "tableTo": "maps",
+          "columnsFrom": ["map_id"],
           "columnsTo": ["ingame_id"],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "no action",
+          "onUpdate": "no action"
         },
         "records_player_id_players_id_fk": {
           "name": "records_player_id_players_id_fk",
           "tableFrom": "records",
-          "columnsFrom": ["player_id"],
           "tableTo": "players",
+          "columnsFrom": ["player_id"],
           "columnsTo": ["id"],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {
+        "records_map_id_player_id_unique": {
+          "name": "records_map_id_player_id_unique",
+          "nullsNotDistinct": false,
+          "columns": ["map_id", "player_id"]
+        },
+        "records_map_id_player_id_time_ms_unique": {
+          "name": "records_map_id_player_id_time_ms_unique",
+          "nullsNotDistinct": false,
+          "columns": ["map_id", "player_id", "time_ms"]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
     }
   },
   "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
   "_meta": {
-    "tables": {},
-    "columns": {}
-  },
-  "id": "bce4a88f-51eb-43af-995f-11060ed3a688",
-  "prevId": "00000000-0000-0000-0000-000000000000"
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
 }

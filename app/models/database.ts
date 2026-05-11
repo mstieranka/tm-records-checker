@@ -1,9 +1,5 @@
-import { drizzle } from "drizzle-orm/bun-sqlite";
-import { Database } from "bun:sqlite";
-import { resolveSync } from "bun";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 
-const sqlite = new Database(resolveSync("./data/sqlite.db", process.cwd()), {
-  create: false,
-  readwrite: true,
-});
-export const db = drizzle(sqlite);
+const client = postgres(process.env.DATABASE_URL!);
+export const db = drizzle(client);
