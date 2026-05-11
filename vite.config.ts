@@ -38,5 +38,8 @@ export default defineConfig({
   ssr: {
     external: ["bun:sqlite", "bun"],
   },
+  optimizeDeps: {
+    entries: ["./app/**/*.tsx"],
+  },
   plugins: [tailwindcss(), reactRouter(), cronPlugin()],
 });
