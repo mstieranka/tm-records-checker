@@ -6,8 +6,13 @@ services:
       POSTGRES_USER: tmrecords
       POSTGRES_PASSWORD: tmrecords
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tmrecords -d tmrecords"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   checker:
     build: .
@@ -20,8 +25,11 @@ services:
       - type: bind
         source: ./data/
         target: /app/data/
+    networks:
+      - tm-records-checker
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
 
 volumes:
