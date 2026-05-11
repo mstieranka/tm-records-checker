@@ -126,7 +126,7 @@ export async function clientAction({ serverAction }: Route.ClientActionArgs) {
   } else if (result.action === ActionType.Poll) {
     if (result.success) {
       const polling = "polling" in result ? result.polling : false;
-      toast.success(`Task "${result.name}" is now ${polling ? "polling" : "not polling"}.`);
+      toast.success(`${polling ? "Started" : "Stopped"} polling "${result.name}".`);
     } else {
       toast.error(`Failed to change polling status for task "${result.name}".`);
     }
