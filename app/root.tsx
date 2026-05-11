@@ -107,7 +107,7 @@ export default function Root() {
           enableSystem
           disableTransitionOnChange
         >
-          <header className="flex items-center justify-between gap-4 border-b px-4 py-3 md:px-6">
+          <header className="flex items-center justify-between gap-4 border-b px-4 md:px-6 h-14">
             <Link to="/" className="font-heading text-base font-medium">
               TM Records Checker
             </Link>
