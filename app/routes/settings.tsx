@@ -1,6 +1,6 @@
 import { Form, useLoaderData, useNavigation } from "react-router";
 import { useForm, getFormProps, getInputProps, getTextareaProps, type FieldMetadata } from "@conform-to/react";
-import { parseWithZod } from "@conform-to/zod";
+import { parseWithZod } from "@conform-to/zod/v4";
 import { IconDeviceFloppy, IconLoader2 } from "@tabler/icons-react";
 import { toast } from "sonner";
 import type { Route } from "./+types/settings";

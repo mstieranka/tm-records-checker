@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 
 type Base = {
   id: string;
@@ -9,10 +9,27 @@ type Base = {
 };
 
 export type SettingDef =
-  | (Base & { kind: "string"; schema: z.ZodType<string | undefined>; default?: string; multiline?: boolean })
-  | (Base & { kind: "number"; schema: z.ZodType<number | undefined>; default?: number; min?: number; max?: number; step?: number })
+  | (Base & {
+      kind: "string";
+      schema: z.ZodType<string | undefined>;
+      default?: string;
+      multiline?: boolean;
+    })
+  | (Base & {
+      kind: "number";
+      schema: z.ZodType<number | undefined>;
+      default?: number;
+      min?: number;
+      max?: number;
+      step?: number;
+    })
   | (Base & { kind: "boolean"; schema: z.ZodType<boolean>; default?: boolean })
-  | (Base & { kind: "enum"; schema: z.ZodEnum<Record<string, string>>; options: { value: string; label: string }[]; default?: string })
+  | (Base & {
+      kind: "enum";
+      schema: z.ZodEnum<Record<string, string>>;
+      options: { value: string; label: string }[];
+      default?: string;
+    })
   | (Base & { kind: "secret"; schema: z.ZodType<string | undefined> })
   | (Base & { kind: "array"; schema: z.ZodType<string[]>; default?: string[] });
 
@@ -22,7 +39,7 @@ export const SETTINGS = [
     name: "Base URL",
     description: "Public URL of this deployment. Used to build OAuth redirect URIs.",
     kind: "string",
-    schema: z.string().url().optional(),
+    schema: z.url().optional(),
     setup: true,
   },
   {
@@ -96,7 +113,13 @@ export const SETTINGS = [
     description: "One GitHub username per line. Only these users can log in.",
     kind: "array",
     schema: z.preprocess(
-      (v) => (typeof v === "string" ? v.split("\n").map((s) => s.trim()).filter(Boolean) : v),
+      (v) =>
+        typeof v === "string"
+          ? v
+              .split("\n")
+              .map((s) => s.trim())
+              .filter(Boolean)
+          : v,
       z.array(z.string().min(1)),
     ),
     default: [],
@@ -105,9 +128,10 @@ export const SETTINGS = [
   {
     id: "notifications.ntfy.baseUrl",
     name: "ntfy base URL",
-    description: "Base URL for the ntfy push notification server. Leave blank to disable notifications.",
+    description:
+      "Base URL for the ntfy push notification server. Leave blank to disable notifications.",
     kind: "string",
-    schema: z.string().url().optional(),
+    schema: z.url().optional(),
     default: "https://ntfy.sh",
   },
   {

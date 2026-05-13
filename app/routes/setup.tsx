@@ -1,6 +1,6 @@
 import { redirect, Form, useLoaderData } from "react-router";
 import { useForm, getFormProps, getInputProps, getTextareaProps, type FieldMetadata } from "@conform-to/react";
-import { parseWithZod } from "@conform-to/zod";
+import { parseWithZod } from "@conform-to/zod/v4";
 import { IconSettings } from "@tabler/icons-react";
 import type { Route } from "./+types/setup";
 import {

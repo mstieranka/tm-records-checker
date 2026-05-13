@@ -44,6 +44,9 @@ if (config.notifications.ntfy) {
     await setSetting("notifications.ntfy.lengthLimit", config.notifications.ntfy.lengthLimit);
   }
 }
-await setSetting("notifications.emptyCountBeforeNotify", config.notifications.emptyCountBeforeNotify);
+await setSetting(
+  "notifications.emptyCountBeforeNotify",
+  config.notifications.emptyCountBeforeNotify,
+);
 
 console.log("Settings seeded successfully.");
