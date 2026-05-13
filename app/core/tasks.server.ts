@@ -1,6 +1,6 @@
 import { db } from "~/models/database";
 import { maps, players, records } from "~/models/schema";
-import { getConfig } from "./config.server";
+import { getSetting } from "~/settings/server";
 import { getTmxMaps } from "./tmxApi";
 import { getPlayerNames } from "./oauthApi";
 import { getRecords } from "./basicApi";
@@ -11,7 +11,14 @@ import { sendRecordsNotification } from "./notifier";
 import { sleep } from "~/utils";
 
 export async function refetchTmxMaps() {
-  const tmxMaps = await getTmxMaps(getConfig().api.tmx.searchParams, getConfig().api.userAgent);
+  const [tmxUserId, userAgent] = await Promise.all([
+    getSetting("api.tmx.userId"),
+    getSetting("api.userAgent"),
+  ]);
+  const tmxMaps = await getTmxMaps(
+    { userId: tmxUserId ?? 0 },
+    userAgent ?? "tm-records-checker",
+  );
   await db
     .insert(maps)
     .values(
@@ -54,13 +61,20 @@ export async function refetchRecords() {
   const updatedRecords: UpdatedRecords = {};
   const mapList = await db.select({ id: maps.ingameId, name: maps.tmxName }).from(maps);
   const now = new Date().toISOString();
+
+  const [tmBasicUsername, tmBasicPassword, userAgent] = await Promise.all([
+    getSetting("api.tmBasic.username"),
+    getSetting("api.tmBasic.password"),
+    getSetting("api.userAgent"),
+  ]);
+  const tmBasic = {
+    username: tmBasicUsername ?? "",
+    password: tmBasicPassword ?? "",
+  };
+
   for await (const map of mapList) {
     try {
-      const apiRecords = await getRecords(
-        map.id,
-        getConfig().api.tmBasic,
-        getConfig().api.userAgent,
-      );
+      const apiRecords = await getRecords(map.id, tmBasic, userAgent ?? "tm-records-checker");
       await db.transaction(async (tx) => {
         await tx
           .insert(records)
@@ -82,7 +96,6 @@ export async function refetchRecords() {
           });
         await fetchPlayersWithNoName(tx);
 
-        // set list of updated records to return for this map
         const newRecords = await tx
           .select({
             playerName: players.name,
@@ -106,10 +119,19 @@ export async function refetchRecords() {
       continue;
     }
   }
-  sendRecordsNotification(updatedRecords, getConfig().notifications);
+  sendRecordsNotification(updatedRecords);
 }
 
 async function fetchPlayersWithNoName(tx?: PgDatabase<PostgresJsQueryResultHKT>) {
+  const [tmOauthClientId, tmOauthClientSecret] = await Promise.all([
+    getSetting("api.tmOauth.clientId"),
+    getSetting("api.tmOauth.clientSecret"),
+  ]);
+  const tmOauth = {
+    clientId: tmOauthClientId ?? "",
+    clientSecret: tmOauthClientSecret ?? "",
+  };
+
   const accountList = await (tx ?? db)
     .select({ id: records.playerId })
     .from(records)
@@ -117,7 +139,7 @@ async function fetchPlayersWithNoName(tx?: PgDatabase<PostgresJsQueryResultHKT>)
     .where(sql`${players.name} IS NULL`);
   for await (const playerList of getPlayerNames(
     accountList.flatMap((p) => (p.id === null ? [] : p.id)),
-    getConfig().api.tmOauth,
+    tmOauth,
   )) {
     await (tx ?? db)
       .insert(players)
@@ -132,12 +154,20 @@ async function fetchPlayersWithNoName(tx?: PgDatabase<PostgresJsQueryResultHKT>)
 }
 
 export async function refetchPlayers() {
-  // max 50 players per request, so we need to do multiple requests
+  const [tmOauthClientId, tmOauthClientSecret] = await Promise.all([
+    getSetting("api.tmOauth.clientId"),
+    getSetting("api.tmOauth.clientSecret"),
+  ]);
+  const tmOauth = {
+    clientId: tmOauthClientId ?? "",
+    clientSecret: tmOauthClientSecret ?? "",
+  };
+
   const accountList = await db.select({ id: players.id }).from(players);
   await db.transaction(async (tx) => {
     for await (const playerList of getPlayerNames(
       accountList.map((p) => p.id),
-      getConfig().api.tmOauth,
+      tmOauth,
     )) {
       await tx
         .insert(players)

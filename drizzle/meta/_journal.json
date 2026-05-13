@@ -8,6 +8,13 @@
       "when": 1778457266970,
       "tag": "0000_violet_groot",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1778663277457,
+      "tag": "0001_condemned_ezekiel_stane",
+      "breakpoints": true
     }
   ]
 }

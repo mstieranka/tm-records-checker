@@ -1,0 +1,238 @@
+{
+  "id": "c762da7a-c653-4675-b6de-7b67f0486f2b",
+  "prevId": "74793922-e303-494c-81b5-e1d3d5677dba",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.maps": {
+      "name": "maps",
+      "schema": "",
+      "columns": {
+        "ingame_id": {
+          "name": "ingame_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "ingame_name": {
+          "name": "ingame_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tmx_id": {
+          "name": "tmx_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tmx_name": {
+          "name": "tmx_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "author_time_ms": {
+          "name": "author_time_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "uploaded_at": {
+          "name": "uploaded_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "maps_tmx_id_unique": {
+          "name": "maps_tmx_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "tmx_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.players": {
+      "name": "players",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.records": {
+      "name": "records",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "records_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "map_id": {
+          "name": "map_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "player_id": {
+          "name": "player_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "time_ms": {
+          "name": "time_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "timestamp": {
+          "name": "timestamp",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "records_map_id_maps_ingame_id_fk": {
+          "name": "records_map_id_maps_ingame_id_fk",
+          "tableFrom": "records",
+          "tableTo": "maps",
+          "columnsFrom": [
+            "map_id"
+          ],
+          "columnsTo": [
+            "ingame_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "records_player_id_players_id_fk": {
+          "name": "records_player_id_players_id_fk",
+          "tableFrom": "records",
+          "tableTo": "players",
+          "columnsFrom": [
+            "player_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "records_map_id_player_id_unique": {
+          "name": "records_map_id_player_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "map_id",
+            "player_id"
+          ]
+        },
+        "records_map_id_player_id_time_ms_unique": {
+          "name": "records_map_id_player_id_time_ms_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "map_id",
+            "player_id",
+            "time_ms"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.settings": {
+      "name": "settings",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "value": {
+          "name": "value",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

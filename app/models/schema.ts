@@ -1,4 +1,4 @@
-import { integer, text, pgTable, unique } from "drizzle-orm/pg-core";
+import { integer, text, pgTable, unique, jsonb, timestamp } from "drizzle-orm/pg-core";
 
 export const maps = pgTable(
   "maps",
@@ -38,4 +38,10 @@ export const records = pgTable(
 export const players = pgTable("players", {
   id: text("id").notNull().primaryKey(),
   name: text("name").notNull(),
+});
+
+export const settings = pgTable("settings", {
+  id: text("id").primaryKey(),
+  value: jsonb("value").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });

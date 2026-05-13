@@ -3,6 +3,7 @@ import { Form, useLoaderData } from "react-router";
 import { IconBrandGithub } from "@tabler/icons-react";
 import type { Route } from "./+types/login";
 import { AUTH_ERROR_KEY, commitSession, getSession, getUser } from "~/auth/session.server";
+import { isSetupComplete } from "~/settings/server";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
@@ -49,6 +50,9 @@ export default function Screen() {
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
+  if (!(await isSetupComplete())) {
+    throw redirect("/setup");
+  }
   if (await getUser(request)) {
     throw redirect("/");
   }

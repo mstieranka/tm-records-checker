@@ -1,43 +1,54 @@
 import { redirect } from "react-router";
 import { Authenticator } from "remix-auth";
 import { GitHubStrategy } from "remix-auth-github";
-import { getConfig } from "~/core/config.server";
-import { User } from "~/auth/types";
+import { getSetting } from "~/settings/server";
+import type { User } from "~/auth/types";
 import { AUTH_ERROR_KEY, commitSession, getUserSession } from "~/auth/session.server";
 
-export let authenticator = new Authenticator<User>();
+export async function getAuthenticator() {
+  const [clientId, clientSecret, baseUrl, allowedUsers, userAgent] = await Promise.all([
+    getSetting("github.clientId"),
+    getSetting("github.clientSecret"),
+    getSetting("base.url"),
+    getSetting("github.allowedUsers"),
+    getSetting("api.userAgent"),
+  ]);
 
-let gitHubStrategy = new GitHubStrategy<User>(
-  {
-    clientId: getConfig().githubAuth.clientId,
-    clientSecret: getConfig().githubAuth.clientSecret,
-    redirectURI:
-      process.env.NODE_ENV === "development"
-        ? "http://localhost:3000/auth/callback"
-        : `${getConfig().baseUrl}/auth/callback`,
-  },
-  async ({ tokens }) => {
-    const res = await fetch("https://api.github.com/user", {
-      headers: {
-        Authorization: `Bearer ${tokens.accessToken()}`,
-        Accept: "application/vnd.github+json",
-        "User-Agent": getConfig().api.userAgent,
+  const authenticator = new Authenticator<User>();
+  authenticator.use(
+    new GitHubStrategy<User>(
+      {
+        clientId: clientId ?? "",
+        clientSecret: clientSecret ?? "",
+        redirectURI:
+          process.env.NODE_ENV === "development"
+            ? "http://localhost:3000/auth/callback"
+            : `${baseUrl}/auth/callback`,
       },
-    });
-    if (!res.ok) {
-      throw new Error(`GitHub user fetch failed: ${res.status}`);
-    }
-    const profile = (await res.json()) as { login: string };
-    if (!getConfig().githubAuth.allowedUsers.includes(profile.login)) {
-      throw new Error('User not allowed, check the "allowedUsers" property in the config file.');
-    }
-    return { username: profile.login };
-  },
-);
-
-authenticator.use(gitHubStrategy);
+      async ({ tokens }) => {
+        const res = await fetch("https://api.github.com/user", {
+          headers: {
+            Authorization: `Bearer ${tokens.accessToken()}`,
+            Accept: "application/vnd.github+json",
+            "User-Agent": userAgent ?? "tm-records-checker",
+          },
+        });
+        if (!res.ok) {
+          throw new Error(`GitHub user fetch failed: ${res.status}`);
+        }
+        const profile = (await res.json()) as { login: string };
+        if (!(allowedUsers ?? []).includes(profile.login)) {
+          throw new Error('User not allowed, check the "allowedUsers" setting.');
+        }
+        return { username: profile.login };
+      },
+    ),
+  );
+  return authenticator;
+}
 
 export async function authenticateOAuth(request: Request, strategy: "github"): Promise<never> {
+  const authenticator = await getAuthenticator();
   try {
     const user = await authenticator.authenticate(strategy, request);
     const session = await getUserSession(request);

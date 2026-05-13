@@ -1,5 +1,6 @@
 import { createCookieSessionStorage, redirect } from "react-router";
 import type { User } from "~/auth/types";
+import { isSetupComplete } from "~/settings/server";
 
 export const AUTH_ERROR_KEY = "auth:error";
 const USER_KEY = "user";
@@ -27,6 +28,9 @@ export async function getUser(request: Request): Promise<User | undefined> {
 }
 
 export async function requireUser(request: Request): Promise<User> {
+  if (!(await isSetupComplete())) {
+    throw redirect("/setup");
+  }
   const user = await getUser(request);
   if (!user) {
     throw redirect("/login");
